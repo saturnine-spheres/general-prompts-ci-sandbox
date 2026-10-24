@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/waiver.schema.json",
+  "title": "Assurance control waiver",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "waiver_id", "control_ids", "scope", "owner", "approver", "reason", "risk", "compensating_control", "evidence", "issue", "work_item", "issued_at", "expires_at", "status", "signature"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "waiver_id": {"type": "string", "pattern": "^WVR-[A-Z0-9-]{8,}$"},
+    "control_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$"}},
+    "scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["project", "revision_or_range", "components", "environments"],
+      "properties": {
+        "project": {"type": "string", "minLength": 1},
+        "revision_or_range": {"type": "string", "minLength": 1},
+        "components": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "environments": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "owner": {"$ref": "#/definitions/human_actor"},
+    "approver": {"$ref": "#/definitions/human_actor"},
+    "reason": {"type": "string", "minLength": 20},
+    "risk": {"type": "object", "additionalProperties": false, "required": ["description", "likelihood", "impact", "residual_risk"], "properties": {"description": {"type": "string", "minLength": 10}, "likelihood": {"enum": ["low", "moderate", "high"]}, "impact": {"enum": ["low", "moderate", "high", "critical"]}, "residual_risk": {"type": "string", "minLength": 10}}},
+    "compensating_control": {"type": "object", "additionalProperties": false, "required": ["description", "owner", "verification"], "properties": {"description": {"type": "string", "minLength": 10}, "owner": {"type": "string", "minLength": 1}, "verification": {"type": "string", "minLength": 10}}},
+    "evidence": {"type": "array", "minItems": 1, "items": {"type": "object", "additionalProperties": false, "required": ["uri", "digest"], "properties": {"uri": {"type": "string", "minLength": 1}, "digest": {"$ref": "#/definitions/sha256"}}}},
+    "issue": {"type": "string", "minLength": 1},
+    "work_item": {"type": "string", "minLength": 1},
+    "issued_at": {"type": "string", "format": "date-time"},
+    "expires_at": {"type": "string", "format": "date-time"},
+    "status": {"enum": ["active", "expired", "revoked", "superseded"]},
+    "signature": {"type": "object", "additionalProperties": false, "required": ["state", "signer", "value_reference"], "properties": {"state": {"const": "verified"}, "signer": {"type": "string", "minLength": 1}, "value_reference": {"type": "string", "minLength": 1}}}
+  },
+  "definitions": {
+    "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "human_actor": {"type": "object", "additionalProperties": false, "required": ["identity", "role"], "properties": {"identity": {"type": "string", "minLength": 1}, "role": {"type": "string", "minLength": 1}}}
+  }
+}

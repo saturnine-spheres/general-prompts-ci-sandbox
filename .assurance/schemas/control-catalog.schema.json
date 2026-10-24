@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/control-catalog.schema.json",
+  "title": "Assurance control catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "catalog_version", "normative_language", "controls"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "catalog_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "normative_language": {"const": "BCP14-uppercase"},
+    "controls": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "title", "strength", "trigger", "action", "verifier", "evidence", "blocking", "owner", "cadence", "exception_eligible"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$"},
+          "title": {"type": "string", "minLength": 3},
+          "strength": {"enum": ["MUST", "SHOULD", "MAY", "MUST NOT"]},
+          "trigger": {"$ref": "#/definitions/trigger"},
+          "action": {"type": "string", "minLength": 10},
+          "verifier": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "blocking": {"type": "boolean"},
+          "owner": {"type": "string", "minLength": 1},
+          "cadence": {"enum": ["per_task", "per_change", "per_merge", "per_release", "continuous", "daily", "weekly", "monthly", "quarterly", "annual", "per_incident"]},
+          "exception_eligible": {"type": "boolean"},
+          "references": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "condition": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "op", "value"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^(profile|work_item|context)\\.[A-Za-z0-9_.-]+$"},
+        "op": {"enum": ["eq", "neq", "in", "not_in", "contains", "intersects", "exists", "gte", "lte"]},
+        "value": {}
+      }
+    },
+    "trigger": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "all": {"type": "array", "items": {"$ref": "#/definitions/condition"}},
+        "any": {"type": "array", "items": {"$ref": "#/definitions/condition"}},
+        "none": {"type": "array", "items": {"$ref": "#/definitions/condition"}}
+      },
+      "minProperties": 1
+    }
+  }
+}

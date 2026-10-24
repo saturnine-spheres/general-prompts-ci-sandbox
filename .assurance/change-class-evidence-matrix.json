@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.1.0",
+  "matrix_version": "1.1.0",
+  "classes": [
+    {
+      "class": "docs",
+      "minimum_tiers": ["verify-fast", "verify"],
+      "required_evidence": ["format/link/schema-example checks", "render or executable-snippet check for changed user instructions", "diff review"],
+      "review": "peer_review",
+      "escalation_triggers": [
+        {"id": "CC-DOC-01", "condition": "documentation changes a normative contract, security instruction, legal statement, or operational procedure", "raises_to": "high", "adds_tiers": ["verify-live"], "adds_evidence": ["contract owner approval", "procedure exercise or dry run"]}
+      ]
+    },
+    {
+      "class": "architecture_design",
+      "minimum_tiers": ["verify-fast", "verify"],
+      "required_evidence": ["version-controlled architecture record", "rendered system/component/deployment/data-flow views selected by the profile", "threat and abuse register", "diagram-to-contract/implementation traceability", "diagram render/link/drift checks", "ADR and owner review"],
+      "review": "independent_review",
+      "escalation_triggers": [
+        {"id": "CC-ARCH-01", "condition": "change adds or alters a trust, identity, privacy, network, deployment, external-service, system-of-record, high-impact, or financial boundary", "raises_to": "high", "adds_tiers": ["verify-live"], "adds_evidence": ["security/privacy/data owner approval", "production-equivalent boundary and failure-path exercise"]}
+      ]
+    },
+    {
+      "class": "domain_code",
+      "minimum_tiers": ["verify-fast", "verify"],
+      "required_evidence": ["unit and contract tests", "changed critical-branch coverage", "static analysis", "defect regression tests"],
+      "review": "peer_review",
+      "escalation_triggers": [
+        {"id": "CC-DOM-01", "condition": "change touches a declared critical path or transaction invariant", "raises_to": "high", "adds_tiers": ["verify-live"], "adds_evidence": ["failure/concurrency tests", "independent review"]}
+      ]
+    },
+    {
+      "class": "api_schema",
+      "minimum_tiers": ["verify-fast", "verify"],
+      "required_evidence": ["schema validation", "consumer/contract tests", "compatibility diff", "versioning and deprecation decision"],
+      "review": "peer_review",
+      "escalation_triggers": [
+        {"id": "CC-API-01", "condition": "public or cross-team contract can reject, reinterpret, expose, or remove existing behavior", "raises_to": "high", "adds_tiers": ["verify-live"], "adds_evidence": ["consumer owner approval", "migration and rollback plan"]}
+      ]
+    },
+    {
+      "class": "migrations_data",
+      "minimum_tiers": ["verify-fast", "verify", "verify-live"],
+      "required_evidence": ["forward migration", "rollback or recovery decision", "backup/restore check", "data validation and loss analysis", "production-equivalent rehearsal"],
+      "review": "independent_review",
+      "escalation_triggers": [
+        {"id": "CC-DATA-01", "condition": "migration is irreversible, destructive, cross-tenant, regulated, or exceeds the declared downtime/data-loss budget", "raises_to": "critical", "adds_tiers": ["verify-release"], "adds_evidence": ["human release approval", "tested recovery and abort thresholds"]}
+      ]
+    },
+    {
+      "class": "auth_security",
+      "minimum_tiers": ["verify-fast", "verify", "verify-live"],
+      "required_evidence": ["threat/abuse analysis", "positive and negative authorization tests", "least-privilege/tenant tests", "semantic security scan", "secret and audit review"],
+      "review": "human_approval_and_independent_review",
+      "escalation_triggers": [
+        {"id": "CC-SEC-01", "condition": "change affects production identity, key custody, cryptography, privilege boundary, or public exploitability", "raises_to": "critical", "adds_tiers": ["verify-release"], "adds_evidence": ["security owner approval", "revocation/rollback exercise"]}
+      ]
+    },
+    {
+      "class": "dependencies_tooling",
+      "minimum_tiers": ["verify-fast", "verify"],
+      "required_evidence": ["need and alternatives", "pinned version/digest", "license/IP review", "vulnerability and provenance scan", "maintenance/noise assessment", "rollout and rollback"],
+      "review": "peer_review",
+      "escalation_triggers": [
+        {"id": "CC-TOOL-01", "condition": "new production dependency, CI enforcement, external service, plugin/MCP server, build/signing tool, or privileged analyzer is introduced", "raises_to": "high", "adds_tiers": ["verify-live", "verify-release"], "adds_evidence": ["authorized material-change record", "supply-chain review"]}
+      ]
+    },
+    {
+      "class": "ui_accessibility",
+      "minimum_tiers": ["verify-fast", "verify"],
+      "required_evidence": ["real browser/device interaction", "keyboard and focus test", "screen-reader/manual accessibility review", "visual states and error recovery", "automated accessibility scan"],
+      "review": "peer_review",
+      "escalation_triggers": [
+        {"id": "CC-UI-01", "condition": "flow is required for authentication, payment, consent, safety, high-impact decisions, or legal access", "raises_to": "high", "adds_tiers": ["verify-live"], "adds_evidence": ["accessibility specialist or authorized human review", "production-equivalent end-to-end test"]}
+      ]
+    },
+    {
+      "class": "performance",
+      "minimum_tiers": ["verify-fast", "verify", "verify-live"],
+      "required_evidence": ["declared workload and budgets", "baseline comparison", "latency/throughput/resource/cost results", "variance and saturation behavior", "cancellation/timeout test"],
+      "review": "peer_review",
+      "escalation_triggers": [
+        {"id": "CC-PERF-01", "condition": "budget regression affects capacity, availability, spend ceiling, or critical user path", "raises_to": "high", "adds_tiers": ["verify-release"], "adds_evidence": ["capacity owner approval", "rollback/limit configuration"]}
+      ]
+    },
+    {
+      "class": "ai_model_behavior",
+      "minimum_tiers": ["verify-fast", "verify", "verify-live"],
+      "required_evidence": ["model/prompt/tool/dataset/provider registry identities", "held-out and adversarial evaluations", "prompt-injection and unsafe-output tests", "repeated-run variance", "evidence ceiling and drift thresholds"],
+      "review": "human_approval_and_independent_review",
+      "escalation_triggers": [
+        {"id": "CC-AI-01", "condition": "output can affect rights, access, employment, finance, health, safety, legal status, protected groups, or execute external effects", "raises_to": "critical", "adds_tiers": ["verify-release"], "adds_evidence": ["human-impact review", "bias/fairness evaluation", "kill-switch and fallback exercise"]}
+      ]
+    },
+    {
+      "class": "infrastructure",
+      "minimum_tiers": ["verify-fast", "verify", "verify-live"],
+      "required_evidence": ["plan/policy diff", "least privilege and egress review", "drift detection", "deployment and rollback rehearsal", "observability and cleanup evidence"],
+      "review": "independent_review",
+      "escalation_triggers": [
+        {"id": "CC-INFRA-01", "condition": "change can delete data, expose a network/identity boundary, alter production routing, or exceed recovery objectives", "raises_to": "critical", "adds_tiers": ["verify-release"], "adds_evidence": ["production approver authorization", "backup/DR and abort-threshold evidence"]}
+      ]
+    },
+    {
+      "class": "release",
+      "minimum_tiers": ["verify-fast", "verify", "verify-live", "verify-release"],
+      "required_evidence": ["immutable candidate", "SBOM/license review", "provenance and signatures", "reproducible build result", "compatibility/migration/rollback", "operational readiness", "independent approval"],
+      "review": "human_approval_and_independent_review",
+      "escalation_triggers": [
+        {"id": "CC-REL-01", "condition": "release is first production use, public, regulated, critical, or changes signing/provenance/distribution", "raises_to": "critical", "adds_tiers": [], "adds_evidence": ["staged rollout and kill-switch confirmation", "business-continuity/fallback exercise"]}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/gate-result.schema.json",
+  "title": "CI evidence gate result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "base", "head", "mode", "computed_tier", "approved_tier", "effective_tier", "tier_reasons", "work_item", "declared_gates", "findings", "baseline", "status"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "base": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+    "head": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+    "mode": {"enum": ["enforce", "report", "ratchet"]},
+    "computed_tier": {"$ref": "#/definitions/tier"},
+    "approved_tier": {"$ref": "#/definitions/tier"},
+    "effective_tier": {"$ref": "#/definitions/tier"},
+    "tier_reasons": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "work_item": {"type": ["string", "null"]},
+    "declared_gates": {"type": "array", "uniqueItems": true, "items": {"enum": ["verify-fast", "verify", "verify-live", "verify-release"]}},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["fingerprint", "message", "status", "ratchetable"],
+        "properties": {
+          "fingerprint": {"type": "string", "minLength": 1},
+          "message": {"type": "string", "minLength": 1},
+          "status": {"enum": ["new", "known"]},
+          "ratchetable": {"type": "boolean"}
+        }
+      }
+    },
+    "baseline": {
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["path", "present", "report_only_until", "known"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "present": {"type": "boolean"},
+        "report_only_until": {"type": ["string", "null"]},
+        "known": {"type": "integer", "minimum": 0},
+        "report_only": {"type": "boolean"},
+        "introduced": {"type": "boolean"}
+      }
+    },
+    "status": {"enum": ["pass", "fail", "report_only"]}
+  },
+  "definitions": {
+    "tier": {"enum": ["routine", "notable", "significant"]}
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "project": "repo",
+  "stack": "go",
+  "generated_by": "general-prompts verifier starter; review and adapt the commands",
+  "tiers": {
+    "verify-fast": {
+      "output": ".assurance/evidence/verify-fast.json",
+      "network": "denied",
+      "container": null,
+      "checks": [
+        {
+          "id": "go-vet",
+          "command": [
+            "go",
+            "vet",
+            "./..."
+          ],
+          "version_command": [
+            "go",
+            "version"
+          ],
+          "blocking": true,
+          "fail_on_output": false,
+          "control_ids": [
+            "VER-001",
+            "VER-003"
+          ],
+          "timeout_seconds": 600
+        },
+        {
+          "id": "go-test-short",
+          "command": [
+            "go",
+            "test",
+            "-short",
+            "./..."
+          ],
+          "version_command": [
+            "go",
+            "version"
+          ],
+          "blocking": true,
+          "fail_on_output": false,
+          "control_ids": [
+            "ENG-002",
+            "VER-001",
+            "VER-003"
+          ],
+          "timeout_seconds": 900
+        }
+      ]
+    },
+    "verify": {
+      "output": ".assurance/evidence/verify.json",
+      "network": "denied",
+      "container": null,
+      "checks": [
+        {
+          "id": "gofmt",
+          "command": [
+            "gofmt",
+            "-l",
+            "."
+          ],
+          "version_command": [
+            "go",
+            "version"
+          ],
+          "blocking": true,
+          "fail_on_output": true,
+          "control_ids": [
+            "VER-001",
+            "VER-003"
+          ],
+          "timeout_seconds": 300
+        },
+        {
+          "id": "go-vet",
+          "command": [
+            "go",
+            "vet",
+            "./..."
+          ],
+          "version_command": [
+            "go",
+            "version"
+          ],
+          "blocking": true,
+          "fail_on_output": false,
+          "control_ids": [
+            "VER-001",
+            "VER-003"
+          ],
+          "timeout_seconds": 600
+        },
+        {
+          "id": "go-test",
+          "command": [
+            "go",
+            "test",
+            "./..."
+          ],
+          "version_command": [
+            "go",
+            "version"
+          ],
+          "blocking": true,
+          "fail_on_output": false,
+          "control_ids": [
+            "ENG-002",
+            "VER-001",
+            "VER-003"
+          ],
+          "timeout_seconds": 3600
+        }
+      ]
+    }
+  }
+}

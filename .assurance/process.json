@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "contract_version": "1.0.0",
+  "stages": [
+    {"id": "intake", "purpose": "Collect the specification source and its context as untrusted data.", "actor": "any", "applies_to_tiers": ["routine", "notable", "significant"], "produces": [], "gates": [], "fresh_context": false},
+    {"id": "specify", "purpose": "Write or update the work item with acceptance criteria, change classes, risk and rigor budget.", "actor": "agent", "applies_to_tiers": ["routine", "notable", "significant"], "produces": ["work_item"], "gates": [], "fresh_context": false},
+    {"id": "tier-check", "purpose": "Classify the planned change against the profile tier rules; unknown classification is significant.", "actor": "automated_service", "applies_to_tiers": ["routine", "notable", "significant"], "produces": [], "gates": [], "fresh_context": false},
+    {"id": "approval", "purpose": "Wait for the named stakeholder to approve the work item before build.", "actor": "human", "applies_to_tiers": ["significant"], "produces": [], "gates": [], "fresh_context": false},
+    {"id": "build", "purpose": "Implement the work item inside its declared scope, adding characterization tests before changing untested behaviour.", "actor": "agent", "applies_to_tiers": ["routine", "notable", "significant"], "produces": ["agent_effect_manifest"], "gates": ["verify-fast"], "fresh_context": false},
+    {"id": "gates", "purpose": "Run the declared verifier tiers and record their results.", "actor": "automated_service", "applies_to_tiers": ["routine", "notable", "significant"], "produces": ["verification_result"], "gates": ["verify"], "fresh_context": false},
+    {"id": "review", "purpose": "Judge the change against every acceptance criterion without the builder's instructions.", "actor": "any", "applies_to_tiers": ["routine", "notable", "significant"], "produces": ["review_record"], "gates": [], "fresh_context": true},
+    {"id": "evidence", "purpose": "Commit the run manifest and evidence under .assurance/runs/<run-id>/.", "actor": "automated_service", "applies_to_tiers": ["routine", "notable", "significant"], "produces": ["run_manifest"], "gates": [], "fresh_context": false},
+    {"id": "publish", "purpose": "Open the pull or merge request linked to the specification; a person merges.", "actor": "automated_service", "applies_to_tiers": ["routine", "notable", "significant"], "produces": ["pull_request"], "gates": [], "fresh_context": false}
+  ],
+  "approvals": {
+    "routine": {"run_approval_required": false, "minimum_approvals": 0, "before_stage": null, "merge_review": "normal"},
+    "notable": {"run_approval_required": false, "minimum_approvals": 0, "before_stage": null, "merge_review": "code_owner"},
+    "significant": {"run_approval_required": true, "minimum_approvals": 1, "before_stage": "build", "merge_review": "stakeholder"}
+  },
+  "rework_limit": 2,
+  "required_sentinels": ["spend", "egress_outside_allowlist", "secret_findings", "writes_outside_declared_paths", "leftover_resources", "unexpected_forge_actions"],
+  "unclassified_tier": "significant"
+}

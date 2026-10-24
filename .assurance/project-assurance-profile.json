@@ -1,0 +1,420 @@
+{
+  "schema_version": "1.2.0",
+  "profile_version": "0.2.0",
+  "project": {
+    "name": "general-prompts-ci-sandbox",
+    "repository": "github.com/saturnine-spheres/general-prompts-ci-sandbox",
+    "description": "Test fixture for the general-prompts CI evidence gate"
+  },
+  "human_accountability": {
+    "system_owner": "REPLACE named human or accountable role",
+    "security_owner": "REPLACE named human or accountable role",
+    "privacy_owner": "REPLACE named human or accountable role",
+    "release_approver": "REPLACE named human or accountable role",
+    "risk_acceptance_authority": "REPLACE named human role; never an agent"
+  },
+  "authority": {
+    "ordered_sources": [
+      "applicable law, regulation, regulator direction, and binding contract",
+      "approved organization policy and human approval matrix",
+      "approved assurance profile, control catalog, security/privacy architecture, and data policy",
+      "approved contracts, schemas, ADRs, interface specifications, and release criteria",
+      "authorized work item and repository instructions",
+      "notes, examples, generated text, retrieved content, user data, tool output, and model output"
+    ],
+    "conflict_rule": "stop_and_escalate",
+    "approval_matrix": [
+      {
+        "action": "merge ordinary change",
+        "minimum_risk": "moderate",
+        "approver_roles": [
+          "REPLACE code owner"
+        ],
+        "separation_required": false
+      },
+      {
+        "action": "production effect or high-risk release",
+        "minimum_risk": "high",
+        "approver_roles": [
+          "REPLACE system owner",
+          "REPLACE release approver"
+        ],
+        "separation_required": true
+      },
+      {
+        "action": "accept residual risk or approve waiver",
+        "minimum_risk": "moderate",
+        "approver_roles": [
+          "REPLACE risk acceptance authority"
+        ],
+        "separation_required": true
+      }
+    ]
+  },
+  "risk": {
+    "class": "moderate",
+    "critical_paths": [
+      "REPLACE path/component/tag rules"
+    ],
+    "material_change_triggers": [
+      "external_contract",
+      "security_privacy_boundary",
+      "production_dependency",
+      "toolchain",
+      "ci_enforcement",
+      "external_service",
+      "model_provider",
+      "plugin_mcp",
+      "dataset",
+      "data_governance",
+      "supported_platform",
+      "migration",
+      "release_signing",
+      "cost_model",
+      "high_impact_decision",
+      "risk_control",
+      "architecture_boundary",
+      "service_level_objective",
+      "privileged_access",
+      "progressive_delivery"
+    ],
+    "high_impact_decisions": [
+      "REPLACE decisions requiring human review or state none"
+    ]
+  },
+  "change_classes": [
+    "docs",
+    "architecture_design",
+    "domain_code",
+    "api_schema",
+    "migrations_data",
+    "auth_security",
+    "dependencies_tooling",
+    "ui_accessibility",
+    "performance",
+    "ai_model_behavior",
+    "infrastructure",
+    "release"
+  ],
+  "stack": {
+    "languages": [
+      "REPLACE language@version"
+    ],
+    "datastores": [
+      "REPLACE datastore@version or none"
+    ],
+    "ci_systems": [
+      "REPLACE CI system"
+    ],
+    "deployment_targets": [
+      "REPLACE target"
+    ]
+  },
+  "platforms": [
+    {
+      "name": "REPLACE platform",
+      "versions": [
+        "REPLACE supported version"
+      ],
+      "support_end": "2099-12-31",
+      "owner": "REPLACE platform owner"
+    }
+  ],
+  "verification_tiers": {
+    "verify-fast": {
+      "entrypoint": "REPLACE command",
+      "timeout_seconds": 600,
+      "network": "denied",
+      "evidence_path": ".assurance/evidence/verify-fast.json"
+    },
+    "verify": {
+      "entrypoint": "REPLACE command",
+      "timeout_seconds": 3600,
+      "network": "allowlisted",
+      "evidence_path": ".assurance/evidence/verify.json"
+    },
+    "verify-live": {
+      "entrypoint": "REPLACE command",
+      "timeout_seconds": 7200,
+      "network": "allowlisted",
+      "evidence_path": ".assurance/evidence/verify-live.json"
+    },
+    "verify-release": {
+      "entrypoint": "REPLACE command",
+      "timeout_seconds": 14400,
+      "network": "allowlisted",
+      "evidence_path": ".assurance/evidence/verify-release.json"
+    }
+  },
+  "tools": [
+    {
+      "id": "replace-tool",
+      "category": "compiler-validator-or-scanner",
+      "version": "REPLACE exact version",
+      "digest": "not-applicable:replace-after-adoption",
+      "owner": "REPLACE tool owner",
+      "approved_uses": [
+        "REPLACE gate and scope"
+      ],
+      "maintenance_review": "2099-01-01",
+      "noise_budget": "REPLACE allowed warning/suppression policy",
+      "license": "REPLACE SPDX identifier or reviewed proprietary terms"
+    }
+  ],
+  "signing": {
+    "commits_required": true,
+    "artifacts_required": true,
+    "allowed_formats": [
+      "REPLACE signing format"
+    ],
+    "key_custody": "REPLACE approved custody, rotation, revocation, and verification policy"
+  },
+  "external_effects": {
+    "default": "deny",
+    "allowed_types": [
+      "REPLACE explicitly allowed effect type or none"
+    ],
+    "egress_allowlist": [],
+    "max_cost": {
+      "currency": "EUR",
+      "amount": 0
+    },
+    "max_egress_bytes": 0,
+    "max_requests": 0,
+    "confirmation_required": true,
+    "ledger_required": true
+  },
+  "release": {
+    "independent_review": true,
+    "sbom_format": "SPDX-3.0-or-approved-equivalent",
+    "provenance_format": "SLSA-provenance-v1-or-approved-equivalent",
+    "rollback_test": true,
+    "backup_restore_test": true,
+    "disaster_recovery_test": true,
+    "progressive_delivery": {
+      "required": true,
+      "stages": [
+        "REPLACE ordered exposure stages and populations"
+      ],
+      "promotion_criteria": "REPLACE measurable comparison, minimum observation, and human/automatic decision",
+      "automatic_halt": "REPLACE thresholds and halt owner",
+      "rollback": "REPLACE maximum rollback time and verification",
+      "safe_disable": "REPLACE feature/config disable path",
+      "blast_radius_limit": "REPLACE maximum users, traffic, data, region, spend, and duration",
+      "owner": "REPLACE release/service owner"
+    }
+  },
+  "architecture_assurance": {
+    "record_path": "docs/architecture/architecture.md",
+    "diagram_format": "mermaid",
+    "required_views": [
+      "system_context",
+      "container_component",
+      "deployment",
+      "data_flow_trust_boundaries"
+    ],
+    "flowchart_triggers": [
+      "authorization_or_approval",
+      "multi_stage_transaction",
+      "state_machine",
+      "retry_timeout_recovery",
+      "rollback_or_safe_disable",
+      "external_effect",
+      "system_of_record_or_reconciliation",
+      "incident_or_continuity"
+    ],
+    "threat_model_method": "REPLACE method, domain abuse cases, risk rating, and acceptance rule",
+    "review_owner": "REPLACE architecture/security owner",
+    "max_review_age_days": 365
+  },
+  "security_assurance": {
+    "adversarial_methods": [
+      "REPLACE fuzzing, dynamic testing, penetration test, red team, fault injection, or justified method"
+    ],
+    "selection_rules": "REPLACE exact risk/change triggers, scope, cadence, success threshold, and evidence",
+    "penetration_testing": {
+      "enabled": true,
+      "cadence_days": 365,
+      "trigger": "REPLACE exposure/risk trigger",
+      "owner": "REPLACE security owner"
+    },
+    "vulnerability_disclosure": "REPLACE reporting channel, intake/triage, safe-harbor decision, remediation SLAs, and disclosure policy",
+    "psirt_owner": "REPLACE product-security incident owner",
+    "privileged_access": {
+      "production_access": "jit_only",
+      "recertification_days": 90,
+      "break_glass": "REPLACE approval, time bound, session audit, alert, and after-action review",
+      "session_audit": true,
+      "environment_separation": "REPLACE development, test, build, and production identity/data/network separation",
+      "owner": "REPLACE access owner"
+    }
+  },
+  "control_effectiveness": {
+    "assessment_cadence_days": 90,
+    "max_evidence_age_days": 90,
+    "sampling_rule": "REPLACE populations, risk strata, sample method/size, exclusions, and claim ceiling",
+    "independent_assessment": "REPLACE independence requirement and assessor",
+    "failure_action": "REPLACE block, contain, notify, remediate, and retest actions",
+    "owner": "REPLACE control assurance owner"
+  },
+  "corporate_agent": {
+    "enabled": false,
+    "human_owner": "REPLACE human owner even when disabled",
+    "high_impact_human_review": true,
+    "workload_identity": "REPLACE identity mechanism",
+    "environment_separation": "REPLACE development, test, and production separation",
+    "delegation_may_expand_authority": false,
+    "untrusted_content_policy": "data_not_instructions",
+    "kill_switch": "REPLACE tested revocation and halt procedure",
+    "registries": {
+      "models": [],
+      "prompts": [],
+      "tools": [],
+      "plugins_mcp": [],
+      "datasets": [],
+      "providers": []
+    },
+    "evaluation": {
+      "held_out": true,
+      "adversarial": true,
+      "prompt_injection": true,
+      "repeated_runs": 3,
+      "bias_fairness_trigger": "required when output affects a person, protected group, access, employment, credit, health, safety, or legal rights",
+      "drift_threshold": "REPLACE metric, threshold, owner, and halt action",
+      "evidence_ceiling": "REPLACE strongest conclusion supported by evaluations"
+    },
+    "fallback_policy": "Stop unless the fallback preserves authority, security, privacy, evidence, and human-review guarantees"
+  },
+  "data_governance": {
+    "classifications": [
+      "public",
+      "internal",
+      "confidential",
+      "restricted"
+    ],
+    "default_classification": "restricted",
+    "residency": [
+      "REPLACE approved regions"
+    ],
+    "retention": "REPLACE duration, legal hold, deletion, and evidence exceptions",
+    "provider_disclosures": "REPLACE approved provider and subprocessor disclosure",
+    "training_use": "REPLACE prohibited or explicitly approved uses",
+    "secret_custody": "REPLACE approved secrets manager; never prompts/source/logs/fixtures/evidence",
+    "test_data_policy": "REPLACE synthetic/de-identified data requirements and approval for exceptions"
+  },
+  "operations": {
+    "performance_budgets": "REPLACE latency, throughput, memory, CPU, storage, network, and cost budgets",
+    "observability": "REPLACE required logs, metrics, traces, alerts, redaction, retention, and owners",
+    "backup": "REPLACE RPO, schedule, immutability, restore verification, and owner",
+    "disaster_recovery": "REPLACE RTO, failover, exercise cadence, and owner",
+    "deprecation_notice_days": 180,
+    "incident_plan": "REPLACE detection, containment, revocation, evidence preservation, notification, recovery, and regression path",
+    "cancellation_timeout_policy": "REPLACE per-operation timeouts, cancellation propagation, rate/resource bounds, and cleanup",
+    "service_level_objectives": [
+      {
+        "name": "REPLACE user-visible objective",
+        "indicator": "REPLACE query/formula/source",
+        "target": "REPLACE threshold",
+        "window": "REPLACE measurement window",
+        "owner": "REPLACE service owner"
+      }
+    ],
+    "error_budget_policy": "REPLACE burn thresholds, release restriction, exception authority, and recovery action",
+    "post_incident_learning": "REPLACE trigger, deadline, independent review, root/control cause, corrective owner, regression, and effectiveness retest",
+    "third_party_resilience": "REPLACE critical providers, concentration limits, outage/exit scenarios, fallback, data return/deletion, cadence, and owner"
+  },
+  "exceptions": {
+    "waiver_schema": ".assurance/schemas/waiver.schema.json",
+    "maximum_days": 30,
+    "prohibited_control_ids": [
+      "GOV-002",
+      "GOV-004",
+      "GOV-008",
+      "GOV-010",
+      "SEC-002",
+      "SEC-007",
+      "AGT-001",
+      "AGT-003",
+      "OPS-005"
+    ]
+  },
+  "human_involvement": {
+    "tier_rules": {
+      "routine_path_allowlist": [
+        "docs/**",
+        "src/**"
+      ],
+      "protected_paths": [
+        "src/payments/**"
+      ],
+      "routine_max_changed_lines": 60,
+      "routine_max_changed_files": 8,
+      "notable_max_changed_lines": 400,
+      "dependency_change_tier": "notable",
+      "run_budget": {
+        "currency": "EUR",
+        "amount": 0,
+        "max_duration_minutes": 60
+      },
+      "unclassified_tier": "significant"
+    },
+    "roles": {
+      "routine": {
+        "reviewers": [
+          "REPLACE normal pull or merge request reviewer role"
+        ],
+        "stakeholders": []
+      },
+      "notable": {
+        "reviewers": [
+          "REPLACE code owner role"
+        ],
+        "stakeholders": []
+      },
+      "significant": {
+        "reviewers": [
+          "REPLACE code owner role"
+        ],
+        "stakeholders": [
+          "github:saturnine-spheres"
+        ]
+      }
+    },
+    "timers": {
+      "reminder_hours": 24,
+      "escalation_hours": 72,
+      "expiry_hours": 168
+    }
+  },
+  "delivery": {
+    "commit_message_style": "short plain imperative subject",
+    "attribution": "forbidden",
+    "push_policy": {
+      "agent_may_push": false,
+      "requires_passing_checks": true,
+      "force_push": false,
+      "protected_branches": [
+        "REPLACE default branch"
+      ]
+    }
+  },
+  "process_light_mode": {
+    "enabled": false,
+    "applies_to": "REPLACE work that may use the light process, or state none",
+    "light_process": "REPLACE the reduced steps and evidence of the light process",
+    "reentry_triggers": [
+      {
+        "id": "tier-raised",
+        "condition": "the computed tier is notable or significant"
+      },
+      {
+        "id": "gate-failed",
+        "condition": "a blocking gate fails or a sentinel differs from its expected value"
+      },
+      {
+        "id": "budget-exceeded",
+        "condition": "the declared rigor budget or run budget is materially exceeded"
+      }
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/agent-effect-manifest.schema.json",
+  "title": "Agent execution and effect manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "manifest_id", "task", "requester", "human_owner", "authority", "agent", "delegation", "models", "tools", "inputs", "filesystem", "network", "bounds", "external_effects", "produced_artifacts", "cleanup", "audit", "status", "started_at", "completed_at"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "manifest_id": {"type": "string", "pattern": "^AEM-[A-Z0-9-]{8,}$"},
+    "task": {"type": "string", "minLength": 1},
+    "requester": {"$ref": "#/definitions/actor"},
+    "human_owner": {"$ref": "#/definitions/human"},
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["grant_id", "scope", "approved_effect_types", "issued_by", "issued_at", "expires_at"],
+      "properties": {
+        "grant_id": {"type": "string", "minLength": 1},
+        "scope": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "approved_effect_types": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "issued_by": {"type": "string", "minLength": 1},
+        "issued_at": {"type": "string", "format": "date-time"},
+        "expires_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "agent": {"type": "object", "additionalProperties": false, "required": ["identity", "version", "workload_identity", "environment"], "properties": {"identity": {"type": "string", "minLength": 1}, "version": {"type": "string", "minLength": 1}, "workload_identity": {"type": "string", "minLength": 1}, "environment": {"type": "string", "minLength": 1}}},
+    "delegation": {"type": "object", "additionalProperties": false, "required": ["parent_manifest", "may_expand_authority", "lineage", "revocation_reference"], "properties": {"parent_manifest": {"type": ["string", "null"]}, "may_expand_authority": {"const": false}, "lineage": {"type": "array", "items": {"type": "string", "minLength": 1}}, "revocation_reference": {"type": "string", "minLength": 1}}},
+    "models": {"type": "array", "items": {"$ref": "#/definitions/component"}},
+    "tools": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/component"}},
+    "inputs": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["uri", "classification", "trusted_instruction_source", "digest"], "properties": {"uri": {"type": "string", "minLength": 1}, "classification": {"type": "string", "minLength": 1}, "trusted_instruction_source": {"type": "boolean"}, "digest": {"$ref": "#/definitions/sha256"}}}},
+    "filesystem": {"type": "object", "additionalProperties": false, "required": ["read", "write"], "properties": {"read": {"type": "array", "items": {"type": "string", "minLength": 1}}, "write": {"type": "array", "items": {"type": "string", "minLength": 1}}}},
+    "network": {"type": "object", "additionalProperties": false, "required": ["policy", "destinations"], "properties": {"policy": {"enum": ["denied", "allowlisted"]}, "destinations": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}}},
+    "bounds": {"type": "object", "additionalProperties": false, "required": ["currency", "max_cost", "max_egress_bytes", "max_requests", "max_runtime_seconds"], "properties": {"currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "max_cost": {"type": "number", "minimum": 0}, "max_egress_bytes": {"type": "integer", "minimum": 0}, "max_requests": {"type": "integer", "minimum": 0}, "max_runtime_seconds": {"type": "integer", "minimum": 1}}},
+    "external_effects": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["effect_id", "type", "target", "requested", "authorized", "reversible", "idempotency_key", "confirmation", "status"], "properties": {"effect_id": {"type": "string", "minLength": 1}, "type": {"type": "string", "minLength": 1}, "target": {"type": "string", "minLength": 1}, "requested": {"type": "boolean"}, "authorized": {"type": "boolean"}, "reversible": {"type": "boolean"}, "idempotency_key": {"type": "string", "minLength": 1}, "confirmation": {"type": "string", "minLength": 1}, "status": {"enum": ["planned", "attempted", "confirmed", "failed", "reverted", "not_executed"]}}}},
+    "produced_artifacts": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["uri", "media_type", "digest", "lineage"], "properties": {"uri": {"type": "string", "minLength": 1}, "media_type": {"type": "string", "minLength": 1}, "digest": {"$ref": "#/definitions/sha256"}, "lineage": {"type": "array", "items": {"type": "string", "minLength": 1}}}}},
+    "cleanup": {"type": "object", "additionalProperties": false, "required": ["plan", "targets", "status", "confirmation"], "properties": {"plan": {"type": "string", "minLength": 1}, "targets": {"type": "array", "items": {"type": "string", "minLength": 1}}, "status": {"enum": ["planned", "complete", "partial", "failed", "not_required"]}, "confirmation": {"type": "string", "minLength": 1}}},
+    "audit": {"type": "object", "additionalProperties": false, "required": ["ledger_uri", "tamper_evidence", "event_count", "digest"], "properties": {"ledger_uri": {"type": "string", "minLength": 1}, "tamper_evidence": {"type": "string", "minLength": 1}, "event_count": {"type": "integer", "minimum": 0}, "digest": {"$ref": "#/definitions/sha256"}}},
+    "status": {"enum": ["planned", "running", "complete", "blocked", "failed", "cancelled"]},
+    "started_at": {"type": ["string", "null"], "format": "date-time"},
+    "completed_at": {"type": ["string", "null"], "format": "date-time"}
+  },
+  "definitions": {
+    "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "actor": {"type": "object", "additionalProperties": false, "required": ["identity", "kind"], "properties": {"identity": {"type": "string", "minLength": 1}, "kind": {"enum": ["human", "service", "agent"]}}},
+    "human": {"type": "object", "additionalProperties": false, "required": ["identity", "role"], "properties": {"identity": {"type": "string", "minLength": 1}, "role": {"type": "string", "minLength": 1}}},
+    "component": {"type": "object", "additionalProperties": false, "required": ["id", "version", "digest", "capabilities"], "properties": {"id": {"type": "string", "minLength": 1}, "version": {"type": "string", "minLength": 1}, "digest": {"type": "string", "pattern": "^(sha256:[a-f0-9]{64}|not-applicable:[a-z0-9._-]+)$"}, "capabilities": {"type": "array", "items": {"type": "string", "minLength": 1}}}}
+  }
+}

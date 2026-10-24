@@ -1,0 +1,102 @@
+# CI evidence gate for GitHub pull requests (general-prompts GitHub adapter).
+# Installed as .github/workflows/assurance-gate.yml. Make the "assurance-gate" check required on the
+# default branch so a failing gate blocks merge. The gate logic is the forge-neutral
+# .assurance/tools/assurance_gate.py; this file only supplies pull request context.
+#
+# Repository variables (Settings > Secrets and variables > Actions > Variables):
+#   ASSURANCE_GATE_MODE     enforce (default), report, or ratchet
+#   ASSURANCE_STAKEHOLDERS  comma-separated logins whose approving reviews count as significant-tier approvals
+# Labels: tier:routine, tier:notable, tier:significant are set by the classifier; a maintainer adds
+# baseline-approved to accept new ratchet baseline entries.
+name: assurance-gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled, ready_for_review]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: write  # tier labels only
+
+concurrency:
+  group: assurance-gate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  assurance-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE: ${{ github.event.pull_request.base.sha }}
+      HEAD: ${{ github.event.pull_request.head.sha }}
+      PR: ${{ github.event.pull_request.number }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Classify tier
+        id: classify
+        run: |
+          python .assurance/tools/assurance_gate.py classify --base "$BASE" --head "$HEAD" --output tier.json
+          echo "tier=$(python -c 'import json; print(json.load(open("tier.json"))["tier"])')" >> "$GITHUB_OUTPUT"
+
+      - name: Label tier
+        # Fork pull requests get a read-only token; the tier still appears in the job log.
+        if: github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          TIER: ${{ steps.classify.outputs.tier }}
+        run: |
+          for tier in routine notable significant; do
+            gh label create "tier:$tier" --repo "$GITHUB_REPOSITORY" --description "Delivery tier computed by the assurance gate" --color ededed 2>/dev/null || true
+          done
+          gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --remove-label tier:routine,tier:notable,tier:significant >/dev/null 2>&1 || true
+          gh pr edit "$PR" --repo "$GITHUB_REPOSITORY" --add-label "tier:$TIER"
+
+      - name: Export stakeholder approvals
+        env:
+          STAKEHOLDERS: ${{ vars.ASSURANCE_STAKEHOLDERS }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/reviews" --paginate > reviews.json
+          python - <<'EOF'
+          import json, os
+          stakeholders = {name.strip().lower() for name in os.environ.get("STAKEHOLDERS", "").split(",") if name.strip()}
+          latest = {}
+          for review in json.load(open("reviews.json")):
+              latest[review["user"]["login"].lower()] = review
+          approvals = [{"identity": f"github:{login}", "kind": "human", "role": "stakeholder", "tier": "significant", "decision": "approve",
+                        "decided_at": review["submitted_at"], "reference": review["html_url"]}
+                       for login, review in latest.items() if login in stakeholders and review["state"] == "APPROVED"
+                       and review["commit_id"] == os.environ["HEAD"]]
+          json.dump({"approvals": approvals}, open("approvals.json", "w"), indent=2)
+          print(f"{len(approvals)} stakeholder approval(s) on the head commit")
+          EOF
+
+      - name: Evidence gate
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+          MODE: ${{ vars.ASSURANCE_GATE_MODE || 'enforce' }}
+          GROWTH_APPROVED: ${{ contains(github.event.pull_request.labels.*.name, 'baseline-approved') }}
+        run: |
+          work_item="$(printf '%s\n' "$BODY" | tr -d '\r' | sed -n 's/^Work-Item:[[:space:]]*//p' | head -n 1)"
+          args=(check --base "$BASE" --head "$HEAD" --mode "$MODE" --approval-record approvals.json --output gate-result.json)
+          if [ -n "$work_item" ]; then args+=(--work-item "$work_item"); fi
+          if [ "$GROWTH_APPROVED" = "true" ]; then args+=(--baseline-growth-approved); fi
+          python .assurance/tools/assurance_gate.py "${args[@]}"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        if: always()
+        with:
+          name: assurance-gate-result
+          path: |
+            tier.json
+            gate-result.json
+          if-no-files-found: ignore

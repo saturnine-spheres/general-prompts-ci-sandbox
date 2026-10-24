@@ -1,0 +1,245 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/schemas/assurance-system-manifest.schema.json",
+  "title": "Installed assurance system provenance manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "system",
+    "installation",
+    "managed_artifacts",
+    "project_decisions",
+    "migration_history"
+  ],
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ]
+    },
+    "system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "source",
+        "source_revision",
+        "distribution_digest"
+      ],
+      "properties": {
+        "id": {
+          "const": "development-assurance-system"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "distribution_digest": {
+          "type": "string",
+          "pattern": "^(sha256:[0-9a-f]{64}|unknown:[A-Za-z0-9._ -]+)$"
+        }
+      }
+    },
+    "installation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "selected_preset",
+        "installed_at",
+        "installed_by",
+        "repository",
+        "baseline_revision",
+        "status"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "greenfield",
+            "existing"
+          ]
+        },
+        "selected_preset": {
+          "enum": [
+            "lightweight",
+            "general",
+            "corporate-high-risk"
+          ]
+        },
+        "installed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "installed_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "repository": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseline_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "owner-reviewed",
+            "approved",
+            "superseded"
+          ]
+        },
+        "footprint": {
+          "enum": [
+            "full",
+            "minimal"
+          ]
+        },
+        "legacy": {
+          "type": "boolean"
+        },
+        "adapters": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "claude-code",
+              "github",
+              "gitlab"
+            ]
+          }
+        }
+      }
+    },
+    "managed_artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "upstream_path",
+          "upstream_digest",
+          "installed_digest",
+          "ownership",
+          "local_changes"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^(?![A-Za-z]:|/|.*(?:^|/)\\.\\.(?:/|$)).+$"
+          },
+          "upstream_path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "upstream_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "installed_digest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "ownership": {
+            "enum": [
+              "upstream-managed",
+              "merge-managed",
+              "project-owned"
+            ]
+          },
+          "local_changes": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "project_decisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "never_overwrite_paths",
+        "notes"
+      ],
+      "properties": {
+        "never_overwrite_paths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "migration_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "from_version",
+          "to_version",
+          "changed_at",
+          "owner",
+          "record",
+          "result"
+        ],
+        "properties": {
+          "from_version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
+          "to_version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
+          "changed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "owner": {
+            "type": "string",
+            "minLength": 1
+          },
+          "record": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "enum": [
+              "applied",
+              "rolled_back",
+              "partial",
+              "rejected"
+            ]
+          },
+          "migration_id": {
+            "type": "string",
+            "pattern": "^MIG-[0-9]{8}T[0-9]{6}Z-[a-f0-9]{8}$"
+          }
+        }
+      }
+    }
+  }
+}

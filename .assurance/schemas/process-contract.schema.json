@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/process-contract.schema.json",
+  "title": "Delivery process contract",
+  "description": "Engine-neutral description of the delivery workflow. Adapters read it; the CI evidence gate validates runs against it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "stages", "approvals", "rework_limit", "required_sentinels", "unclassified_tier"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "contract_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "stages": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "purpose", "actor", "applies_to_tiers", "produces", "gates", "fresh_context"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
+          "purpose": {"type": "string", "minLength": 1},
+          "actor": {"enum": ["agent", "human", "automated_service", "any"]},
+          "applies_to_tiers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/definitions/tier"}},
+          "produces": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/definitions/artifact_type"}},
+          "gates": {"type": "array", "uniqueItems": true, "items": {"enum": ["verify-fast", "verify", "verify-live", "verify-release"]}},
+          "fresh_context": {"type": "boolean"}
+        }
+      }
+    },
+    "approvals": {
+      "type": "object", "additionalProperties": false,
+      "required": ["routine", "notable", "significant"],
+      "properties": {
+        "routine": {"$ref": "#/definitions/approval_rule"},
+        "notable": {"$ref": "#/definitions/approval_rule"},
+        "significant": {"$ref": "#/definitions/approval_rule"}
+      }
+    },
+    "rework_limit": {"type": "integer", "minimum": 1},
+    "required_sentinels": {
+      "type": "array", "uniqueItems": true,
+      "items": {"enum": ["spend", "egress_outside_allowlist", "secret_findings", "writes_outside_declared_paths", "leftover_resources", "unexpected_forge_actions"]}
+    },
+    "unclassified_tier": {"const": "significant"}
+  },
+  "definitions": {
+    "tier": {"enum": ["routine", "notable", "significant"]},
+    "artifact_type": {"enum": ["work_item", "verification_result", "review_record", "waiver", "agent_effect_manifest", "run_manifest", "pull_request"]},
+    "approval_rule": {
+      "type": "object", "additionalProperties": false,
+      "required": ["run_approval_required", "minimum_approvals", "before_stage", "merge_review"],
+      "properties": {
+        "run_approval_required": {"type": "boolean"},
+        "minimum_approvals": {"type": "integer", "minimum": 0},
+        "before_stage": {"type": ["string", "null"], "pattern": "^[a-z][a-z0-9_-]*$"},
+        "merge_review": {"enum": ["normal", "code_owner", "stakeholder"]}
+      }
+    }
+  }
+}

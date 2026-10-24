@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/change-class-evidence-matrix.schema.json",
+  "title": "Change class evidence matrix",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "matrix_version", "classes"],
+  "properties": {
+    "schema_version": {"const": "1.1.0"},
+    "matrix_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "classes": {
+      "type": "array", "minItems": 12, "maxItems": 12,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["class", "minimum_tiers", "required_evidence", "review", "escalation_triggers"],
+        "properties": {
+          "class": {"enum": ["docs", "architecture_design", "domain_code", "api_schema", "migrations_data", "auth_security", "dependencies_tooling", "ui_accessibility", "performance", "ai_model_behavior", "infrastructure", "release"]},
+          "minimum_tiers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["verify-fast", "verify", "verify-live", "verify-release"]}},
+          "required_evidence": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "review": {"enum": ["self_review", "peer_review", "independent_review", "human_approval_and_independent_review"]},
+          "escalation_triggers": {
+            "type": "array", "minItems": 1,
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["id", "condition", "raises_to", "adds_tiers", "adds_evidence"],
+              "properties": {
+                "id": {"type": "string", "pattern": "^CC-[A-Z]{2,5}-[0-9]{2}$"},
+                "condition": {"type": "string", "minLength": 5},
+                "raises_to": {"enum": ["moderate", "high", "critical"]},
+                "adds_tiers": {"type": "array", "uniqueItems": true, "items": {"enum": ["verify-fast", "verify", "verify-live", "verify-release"]}},
+                "adds_evidence": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

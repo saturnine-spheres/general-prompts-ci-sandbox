@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/review-record.schema.json",
+  "title": "Assurance review record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "record_id", "work_item", "revision", "implementer", "reviewer", "scope", "evidence", "findings", "decision", "started_at", "completed_at", "signature"],
+  "properties": {
+    "schema_version": {"enum": ["1.0.0", "1.1.0"]},
+    "record_id": {"type": "string", "pattern": "^REV-[A-Z0-9-]{8,}$"},
+    "work_item": {"type": "string", "minLength": 1},
+    "revision": {"$ref": "#/definitions/sha256"},
+    "implementer": {"$ref": "#/definitions/actor"},
+    "reviewer": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identity", "kind", "context_id", "authorized_role", "independent", "independence_basis"],
+      "properties": {
+        "identity": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["human", "automated_service", "agent"]},
+        "context_id": {"type": "string", "minLength": 1},
+        "authorized_role": {"type": "string", "minLength": 1},
+        "independent": {"type": "boolean"},
+        "independence_basis": {"type": "string", "minLength": 10}
+      }
+    },
+    "scope": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/evidence_ref"}},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "severity", "status", "summary", "control_ids"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "severity": {"enum": ["info", "low", "moderate", "high", "critical"]},
+          "status": {"enum": ["open", "resolved", "accepted_by_human_authority"]},
+          "summary": {"type": "string", "minLength": 1},
+          "control_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$"}}
+        }
+      }
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "verdict", "rationale", "evidence"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^AC-[0-9]+$"},
+          "verdict": {"enum": ["met", "not_met", "not_verifiable"]},
+          "rationale": {"type": "string", "minLength": 10},
+          "evidence": {"type": "array", "items": {"$ref": "#/definitions/evidence_ref"}}
+        }
+      }
+    },
+    "decision": {"enum": ["approve", "reject", "changes_requested", "advisory"]},
+    "started_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "signature": {
+      "type": "object", "additionalProperties": false,
+      "required": ["state", "format", "signer", "value_reference"],
+      "properties": {
+        "state": {"enum": ["verified", "unverified", "not_required"]},
+        "format": {"type": "string", "minLength": 1},
+        "signer": {"type": "string", "minLength": 1},
+        "value_reference": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "definitions": {
+    "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "actor": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identity", "kind", "context_id"],
+      "properties": {
+        "identity": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["human", "automated_service", "agent"]},
+        "context_id": {"type": "string", "minLength": 1}
+      }
+    },
+    "evidence_ref": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "uri", "digest"],
+      "properties": {
+        "type": {"type": "string", "minLength": 1},
+        "uri": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/definitions/sha256"}
+      }
+    }
+  }
+}
