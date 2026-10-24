@@ -1,0 +1,29 @@
+{
+  "stage": "classify",
+  "change_classes": [
+    "domain_code"
+  ],
+  "proposed_tier": "routine",
+  "result": {
+    "tier": "significant",
+    "reasons": [
+      {
+        "code": "classification_unknown",
+        "tier": "significant",
+        "detail": "repository rules: tier_rules: run_budget currency must be USD, the currency of the team's ceiling"
+      },
+      {
+        "code": "proposed_tier",
+        "tier": "routine"
+      }
+    ],
+    "rules_digest": "sha256:b37013c03a9edf03ec0d3bbaf7884bb12d2ccf0ddbb7ac5629f686e9b74ed395"
+  },
+  "rules": {
+    "source": "repository",
+    "block_digest": "sha256:4bc5ac05304636c374ff966c5b02fd2486d5ac7f5d1dc311acdc287fe79d8dfd",
+    "budget_cents": 500,
+    "error": "tier_rules: run_budget currency must be USD, the currency of the team's ceiling",
+    "matrix_digest": "sha256:aeb0773a9f4fb943259b0b6ea3b85205c9cfbb049ea66af5ef0f85e5aa18c261"
+  }
+}

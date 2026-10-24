@@ -1,0 +1,188 @@
+{
+  "artifacts": [
+    {
+      "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/change-summary.md",
+      "digest": "sha256:5bc235d240ebb2ddfb70854cd1f6ecfd470b701bf5113cf10eaa867db99a18b5",
+      "bytes": 1331
+    },
+    {
+      "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/classification.json",
+      "digest": "sha256:81f0b1b9f627092e6730aa2df3d2bfe52962b0d848337a731b96b79d97ece092",
+      "bytes": 905
+    },
+    {
+      "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/intent.md",
+      "digest": "sha256:525d29cb0553e82c53bf1f917e9feccfd0b9eb5e16d4508c3eb71c1163131929",
+      "bytes": 464
+    },
+    {
+      "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/plan.md",
+      "digest": "sha256:4c2e07144cb293f9c0746e1121716f8de12dfd525eed33e8680fde9f35c8b858",
+      "bytes": 633
+    },
+    {
+      "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/spec.md",
+      "digest": "sha256:6a5f141ea39be707fbe1599621382c9dd746de153eb036e58a76e7dc7c222db0",
+      "bytes": 2991
+    },
+    {
+      "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/verification-result.json",
+      "digest": "sha256:42a2ba5de3dba61dc85422ef7eb15d463244b95d5ba318fa2e1147b7ad96c6cc",
+      "bytes": 234
+    }
+  ],
+  "definition": {
+    "digest": "sha256:481c025f6663c82a47339d5d5f7b01517879c8d1325c107cc45af41ee74e405a",
+    "pipeline_id": "pipe_v0_default_delivery",
+    "revision": 1
+  },
+  "generated_at": "2026-10-24T16:36:01.25639Z",
+  "organization_id": "v0-team",
+  "repository": {
+    "base_branch": "main",
+    "base_commit": "e3f606fa9ee1e61295237091392db40004019032",
+    "full_name": "saturnine-spheres/general-prompts-ci-sandbox",
+    "run_branch": "praxis/run/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152"
+  },
+  "run_id": "prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152",
+  "schema_version": "1.0",
+  "stages": [
+    {
+      "node_id": "intake",
+      "node_run_id": "pnr_2c93a93de56d31066eac4f24688fd2c94aefa2a4",
+      "attempt": 1,
+      "actor_class": "system",
+      "outcome": "accepted",
+      "started_at": "2026-10-24T16:29:26.401747Z",
+      "duration_ms": 1010,
+      "input_artifacts": [],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/intent.md",
+          "digest": "sha256:525d29cb0553e82c53bf1f917e9feccfd0b9eb5e16d4508c3eb71c1163131929"
+        }
+      ]
+    },
+    {
+      "node_id": "specify",
+      "node_run_id": "pnr_3c94a0a5ac4d05bb731eb6ac236326094383144d",
+      "attempt": 1,
+      "actor_class": "agent",
+      "outcome": "succeeded",
+      "started_at": "2026-10-24T16:29:27.491962Z",
+      "duration_ms": 31346,
+      "runner": {
+        "name": "claude-code",
+        "version": "2.1.309",
+        "model": "claude-sonnet-5-5",
+        "role_instructions_digest": "sha256:e887c0a7d6ff2c964f1dc297d8f9ecc6e7457095a73578cd3a04e3f1289ceac3",
+        "turns": 7,
+        "input_tokens": 10,
+        "output_tokens": 2268,
+        "cost_micros_usd": 51736
+      },
+      "input_artifacts": [
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/intent.md",
+          "digest": "sha256:525d29cb0553e82c53bf1f917e9feccfd0b9eb5e16d4508c3eb71c1163131929"
+        }
+      ],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/spec.md",
+          "digest": "sha256:6a5f141ea39be707fbe1599621382c9dd746de153eb036e58a76e7dc7c222db0",
+          "bytes": 2991
+        }
+      ]
+    },
+    {
+      "node_id": "classify",
+      "node_run_id": "pnr_03710ed2ce2073792bc304a4a932b174c3c27ebf",
+      "attempt": 1,
+      "actor_class": "worker",
+      "outcome": "failed",
+      "started_at": "2026-10-24T16:29:58.962451Z",
+      "duration_ms": 0,
+      "input_artifacts": [],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/classification.json",
+          "digest": "sha256:81f0b1b9f627092e6730aa2df3d2bfe52962b0d848337a731b96b79d97ece092",
+          "bytes": 905
+        }
+      ]
+    },
+    {
+      "node_id": "build",
+      "node_run_id": "pnr_d14f00f4234f3c149552043862ecf97f3cea6dde",
+      "attempt": 1,
+      "actor_class": "agent",
+      "outcome": "succeeded",
+      "started_at": "2026-10-24T16:32:28.351922Z",
+      "duration_ms": 31006,
+      "runner": {
+        "name": "claude-code",
+        "version": "2.1.309",
+        "model": "claude-sonnet-5-5",
+        "role_instructions_digest": "sha256:f3f40ea1ea25519df4d89c7c8130b20b912a066ff4e864a9de210b8157c5e0f1",
+        "turns": 7,
+        "input_tokens": 10,
+        "output_tokens": 3121,
+        "cost_micros_usd": 75194
+      },
+      "input_artifacts": [
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/intent.md",
+          "digest": "sha256:525d29cb0553e82c53bf1f917e9feccfd0b9eb5e16d4508c3eb71c1163131929"
+        },
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/spec.md",
+          "digest": "sha256:6a5f141ea39be707fbe1599621382c9dd746de153eb036e58a76e7dc7c222db0"
+        }
+      ],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/change-summary.md",
+          "digest": "sha256:5bc235d240ebb2ddfb70854cd1f6ecfd470b701bf5113cf10eaa867db99a18b5",
+          "bytes": 1331
+        },
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/plan.md",
+          "digest": "sha256:4c2e07144cb293f9c0746e1121716f8de12dfd525eed33e8680fde9f35c8b858",
+          "bytes": 633
+        }
+      ]
+    },
+    {
+      "node_id": "verify",
+      "node_run_id": "pnr_b43376e95a430f9d1b3f65eb2e5ad7c955ed1fbd",
+      "attempt": 1,
+      "actor_class": "worker",
+      "outcome": "error",
+      "started_at": "2026-10-24T16:32:59.505704Z",
+      "duration_ms": 0,
+      "input_artifacts": [],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_535f8b7ceb48c8d1b87ecaaf9cf760c58fb4a152/verification-result.json",
+          "digest": "sha256:42a2ba5de3dba61dc85422ef7eb15d463244b95d5ba318fa2e1147b7ad96c6cc",
+          "bytes": 234
+        }
+      ]
+    }
+  ],
+  "tier": {
+    "value": "significant",
+    "rules_digest": "sha256:b37013c03a9edf03ec0d3bbaf7884bb12d2ccf0ddbb7ac5629f686e9b74ed395",
+    "reason_codes": [
+      "classification_unknown",
+      "proposed_tier"
+    ]
+  },
+  "totals": {
+    "cost_micros_usd": 126930,
+    "duration_ms": 63362,
+    "retries": 0,
+    "rework_traversals": 0
+  }
+}
