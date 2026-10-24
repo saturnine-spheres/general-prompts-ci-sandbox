@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.1.0",
+  "record_id": "REV-20261024-67F4",
+  "work_item": "docs/work-items/WI-0001-orders-count.md",
+  "revision": "sha256:87e4b33fe5411a8026b5c486f7c978dbdc84fc5665bdb215fd0f5d2e455d542c",
+  "implementer": {
+    "identity": "agent:claude-code-builder",
+    "kind": "agent",
+    "context_id": "RUN-20261024-102833-67F4:build"
+  },
+  "reviewer": {
+    "identity": "agent:claude-code-reviewer",
+    "kind": "agent",
+    "context_id": "RUN-20261024-102833-67F4:review",
+    "authorized_role": "process review stage (fresh context, without the builder's instructions)",
+    "independent": false,
+    "independence_basis": "Reviewer ran in a fresh subagent context of the same Claude Code harness, with the same identity and authority as the builder; it saw only the work item, the diff b22e4118..99c89637, and the verification records, not the builder's instructions or transcript. This is not an independent review under AGENTS.md."
+  },
+  "scope": [
+    "docs/work-items/WI-0001-orders-count.md",
+    "src/orders/orders.go",
+    "src/orders/orders_test.go"
+  ],
+  "evidence": [
+    {"type": "verification-result", "uri": ".assurance/evidence/verify.json", "digest": "sha256:f8bd7579bf87e9a31225350aedf72fbc93fa07bd98a97d1c93a1230e4ee46965"},
+    {"type": "verification-result", "uri": ".assurance/evidence/verify-fast.json", "digest": "sha256:2e1a73e70b1a677ebe20f795bee0b015a2dd864b6e89a6d323e9153de82c873a"},
+    {"type": "run-sentinels", "uri": ".assurance/runs/RUN-20261024-102833-67F4/sentinels.json", "digest": "sha256:5ba25a8b8f44be2073669fc368ccd6fede822ac633c0ee0c07c5e36af305ec3b"},
+    {"type": "work-item", "uri": "docs/work-items/WI-0001-orders-count.md", "digest": "sha256:3d720306fe1b6f3c6ff40c7e3177e707f84a5c4ca5dfd0f3e3cbc410c830e6b4"},
+    {"type": "test-source", "uri": "src/orders/orders_test.go", "digest": "sha256:4e095cf89e7cf38b2a6ba6bc809d1c3f9fba32ce28ba3334b26400bcea104a36"}
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "verdict": "met",
+      "rationale": "orders.go exports func Count() int; `go doc ./src/orders` at head lists `func Count() int`, and orders_test.go asserts the signature at compile time (`var _ func() int = Count`). gofmt, go vet and go test pass in verify.json for this revision. Count is an exported identifier, so another package that imports orders can call it under Go visibility rules. No test compiles it from an external package (see F-2).",
+      "evidence": [
+        {"type": "verification-result", "uri": ".assurance/evidence/verify.json", "digest": "sha256:f8bd7579bf87e9a31225350aedf72fbc93fa07bd98a97d1c93a1230e4ee46965"},
+        {"type": "test-source", "uri": "src/orders/orders_test.go", "digest": "sha256:4e095cf89e7cf38b2a6ba6bc809d1c3f9fba32ce28ba3334b26400bcea104a36"}
+      ]
+    },
+    {
+      "id": "AC-2",
+      "verdict": "met",
+      "rationale": "TestCount asserts Count() == 1 against the unchanged set {1: \"first\"}. It passes in verify.json (go test ./...) and when the reviewer re-ran `go test -count=1 -v ./...` at head.",
+      "evidence": [
+        {"type": "verification-result", "uri": ".assurance/evidence/verify.json", "digest": "sha256:f8bd7579bf87e9a31225350aedf72fbc93fa07bd98a97d1c93a1230e4ee46965"},
+        {"type": "test-source", "uri": "src/orders/orders_test.go", "digest": "sha256:4e095cf89e7cf38b2a6ba6bc809d1c3f9fba32ce28ba3334b26400bcea104a36"}
+      ]
+    },
+    {
+      "id": "AC-3",
+      "verdict": "met",
+      "rationale": "Find and Count both read the single package variable `known`. TestCount checks that Count equals the number of IDs Find resolves. TestCountAndFindShareOrderSet adds order 2 to `known` and checks that Find(2) and Count()==2 both reflect it, with t.Cleanup restoring the set. Both tests pass in verify.json and in the reviewer's re-run.",
+      "evidence": [
+        {"type": "verification-result", "uri": ".assurance/evidence/verify.json", "digest": "sha256:f8bd7579bf87e9a31225350aedf72fbc93fa07bd98a97d1c93a1230e4ee46965"},
+        {"type": "test-source", "uri": "src/orders/orders_test.go", "digest": "sha256:4e095cf89e7cf38b2a6ba6bc809d1c3f9fba32ce28ba3334b26400bcea104a36"}
+      ]
+    },
+    {
+      "id": "AC-4",
+      "verdict": "met",
+      "rationale": "The diff leaves Find's signature and the order data unchanged; only the map moved to package level. TestFind, which the diff does not modify, checks Find(1) == (\"first\", true) and Find(2) unknown. It passes in verify.json and in the reviewer's re-run.",
+      "evidence": [
+        {"type": "verification-result", "uri": ".assurance/evidence/verify.json", "digest": "sha256:f8bd7579bf87e9a31225350aedf72fbc93fa07bd98a97d1c93a1230e4ee46965"},
+        {"type": "test-source", "uri": "src/orders/orders_test.go", "digest": "sha256:4e095cf89e7cf38b2a6ba6bc809d1c3f9fba32ce28ba3334b26400bcea104a36"}
+      ]
+    },
+    {
+      "id": "AC-5",
+      "verdict": "not_verifiable",
+      "rationale": "No pull request exists yet. The publish stage has not run, and `git ls-remote` shows no remote deliver/orders-count branch. The base branch assurance/claude-adapter exists on origin at b22e4118, so the planned target is available. Who verifies it later: the publish stage's effect confirmation (it reads the PR back and checks head deliver/orders-count, base assurance/claude-adapter and commit 99c89637), then the owner github:saturnine-spheres.",
+      "evidence": [
+        {"type": "work-item", "uri": "docs/work-items/WI-0001-orders-count.md", "digest": "sha256:3d720306fe1b6f3c6ff40c7e3177e707f84a5c4ca5dfd0f3e3cbc410c830e6b4"}
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-1",
+      "severity": "info",
+      "status": "open",
+      "summary": "Scope check passed. The three committed paths (work item, src/orders/orders.go, src/orders/orders_test.go) are inside the declared filesystem scope. There are no governance edits, weakened checks or skipped tests, and the run sentinels report 0 secret findings and 0 out-of-scope writes. Separately, the untracked run records under .assurance/runs/ are outside the declared scope, which names only .assurance/evidence/**. They were produced by delivery_run.py and are not part of the diff. The work item's scope should name them explicitly.",
+      "control_ids": []
+    },
+    {
+      "id": "F-2",
+      "severity": "low",
+      "status": "open",
+      "summary": "AC-1 says Count compiles from another package, but the tests are internal (package orders) and never import orders from outside. The claim rests on Go export rules and go doc output. An external test package (orders_test) would test it directly.",
+      "control_ids": []
+    },
+    {
+      "id": "F-3",
+      "severity": "info",
+      "status": "open",
+      "summary": "TestCountAndFindShareOrderSet mutates the package-level map `known`. That is safe now because no test uses t.Parallel and t.Cleanup restores the set, but parallel tests added later could race on it.",
+      "control_ids": []
+    },
+    {
+      "id": "F-4",
+      "severity": "info",
+      "status": "open",
+      "summary": "The work item still has Status `draft` and its completion record is pending. Its Approver line points to an 'open questions' section that does not exist. The approval-matrix roles are still REPLACE placeholders, which the owner has to resolve before merge approval.",
+      "control_ids": []
+    }
+  ],
+  "decision": "approve",
+  "started_at": "2026-10-24T10:31:00Z",
+  "completed_at": "2026-10-24T10:40:00Z",
+  "signature": {
+    "state": "not_required",
+    "format": "none",
+    "signer": "agent:claude-code-reviewer",
+    "value_reference": "not-applicable"
+  }
+}

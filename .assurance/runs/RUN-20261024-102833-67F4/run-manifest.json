@@ -1,0 +1,195 @@
+{
+  "schema_version": "1.0.0",
+  "run_id": "RUN-20261024-102833-67F4",
+  "specification": {
+    "work_item": "docs/work-items/WI-0001-orders-count.md",
+    "source": "session",
+    "digest": "sha256:3d720306fe1b6f3c6ff40c7e3177e707f84a5c4ca5dfd0f3e3cbc410c830e6b4"
+  },
+  "process_contract": {
+    "version": "1.0.0",
+    "digest": "sha256:4e1ebdc4dfb67596e7b8ca60e62c7adf0820df161f525224b8866c7e5c7b6f59"
+  },
+  "computed_tier": "notable",
+  "approved_tier": "notable",
+  "status": "succeeded",
+  "started_at": "2026-10-24T10:28:33Z",
+  "completed_at": "2026-10-24T10:32:17Z",
+  "base_revision": "b22e4118f8d66121d146c3feebbc5b339ffdaac2",
+  "stages": [
+    {
+      "stage": "intake",
+      "runner": {
+        "identity": "agent:claude-code",
+        "kind": "agent",
+        "context_id": "unrecorded-context"
+      },
+      "model": "claude-opus-5-5",
+      "started_at": "2026-10-24T10:28:33Z",
+      "completed_at": "2026-10-24T10:28:33Z",
+      "duration_seconds": 0.0,
+      "cost": {
+        "currency": "EUR",
+        "amount": 0.0
+      },
+      "attempts": 1,
+      "outcome": "pass"
+    },
+    {
+      "stage": "specify",
+      "runner": {
+        "identity": "agent:claude-code",
+        "kind": "agent",
+        "context_id": "unrecorded-context"
+      },
+      "model": "claude-opus-5-5",
+      "started_at": "2026-10-24T10:28:38Z",
+      "completed_at": "2026-10-24T10:28:38Z",
+      "duration_seconds": 0.0,
+      "cost": {
+        "currency": "EUR",
+        "amount": 0.0
+      },
+      "attempts": 1,
+      "outcome": "pass"
+    },
+    {
+      "stage": "tier-check",
+      "runner": {
+        "identity": "agent:claude-code",
+        "kind": "agent",
+        "context_id": "unrecorded-context"
+      },
+      "model": "claude-opus-5-5",
+      "started_at": "2026-10-24T10:28:43Z",
+      "completed_at": "2026-10-24T10:28:43Z",
+      "duration_seconds": 0.0,
+      "cost": {
+        "currency": "EUR",
+        "amount": 0.0
+      },
+      "attempts": 1,
+      "outcome": "pass"
+    },
+    {
+      "stage": "build",
+      "runner": {
+        "identity": "agent:claude-code",
+        "kind": "agent",
+        "context_id": "unrecorded-context"
+      },
+      "model": "claude-opus-5-5",
+      "started_at": "2026-10-24T10:30:07Z",
+      "completed_at": "2026-10-24T10:30:07Z",
+      "duration_seconds": 0.0,
+      "cost": {
+        "currency": "EUR",
+        "amount": 0.0
+      },
+      "attempts": 1,
+      "outcome": "pass"
+    },
+    {
+      "stage": "gates",
+      "runner": {
+        "identity": "automated_service:verify",
+        "kind": "automated_service",
+        "context_id": "unrecorded-context"
+      },
+      "model": "none",
+      "started_at": "2026-10-24T10:30:18Z",
+      "completed_at": "2026-10-24T10:30:18Z",
+      "duration_seconds": 0.0,
+      "cost": {
+        "currency": "EUR",
+        "amount": 0.0
+      },
+      "attempts": 1,
+      "outcome": "pass"
+    },
+    {
+      "stage": "review",
+      "runner": {
+        "identity": "agent:assurance-reviewer",
+        "kind": "agent",
+        "context_id": "unrecorded-context"
+      },
+      "model": "claude-opus-5-5",
+      "started_at": "2026-10-24T10:32:16Z",
+      "completed_at": "2026-10-24T10:32:16Z",
+      "duration_seconds": 0.0,
+      "cost": {
+        "currency": "EUR",
+        "amount": 0.0
+      },
+      "attempts": 1,
+      "outcome": "pass"
+    },
+    {
+      "stage": "evidence",
+      "runner": {
+        "identity": "automated_service:delivery_run",
+        "kind": "automated_service",
+        "context_id": "unrecorded-context"
+      },
+      "model": "none",
+      "started_at": "2026-10-24T10:32:16Z",
+      "completed_at": "2026-10-24T10:32:16Z",
+      "duration_seconds": 0.0,
+      "cost": {
+        "currency": "EUR",
+        "amount": 0.0
+      },
+      "attempts": 1,
+      "outcome": "pass"
+    },
+    {
+      "stage": "publish",
+      "runner": {
+        "identity": "automated_service:delivery_run",
+        "kind": "automated_service",
+        "context_id": "unrecorded-context"
+      },
+      "model": "none",
+      "started_at": "2026-10-24T10:32:17Z",
+      "completed_at": "2026-10-24T10:32:17Z",
+      "duration_seconds": 0.0,
+      "cost": {
+        "currency": "EUR",
+        "amount": 0.0
+      },
+      "attempts": 1,
+      "outcome": "pass"
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "work_item",
+      "uri": "docs/work-items/WI-0001-orders-count.md",
+      "digest": "sha256:3d720306fe1b6f3c6ff40c7e3177e707f84a5c4ca5dfd0f3e3cbc410c830e6b4"
+    },
+    {
+      "type": "verification_result",
+      "uri": ".assurance/evidence/verify-fast.json",
+      "digest": "sha256:2e1a73e70b1a677ebe20f795bee0b015a2dd864b6e89a6d323e9153de82c873a"
+    },
+    {
+      "type": "verification_result",
+      "uri": ".assurance/evidence/verify.json",
+      "digest": "sha256:f8bd7579bf87e9a31225350aedf72fbc93fa07bd98a97d1c93a1230e4ee46965"
+    },
+    {
+      "type": "review_record",
+      "uri": ".assurance/reviews/REV-20261024-67F4.json",
+      "digest": "sha256:c45f84a89ba2686e33bee72c21f2b29ec81cd96bf0c9cc48ab80fbc98e4f1067"
+    }
+  ],
+  "approvals": [],
+  "totals": {
+    "duration_seconds": 224.2,
+    "cost": {
+      "currency": "EUR",
+      "amount": 0.0
+    }
+  }
+}
