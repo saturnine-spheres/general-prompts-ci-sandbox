@@ -125,13 +125,13 @@
       "entrypoint": "bash .assurance/tools/verify-fast.sh",
       "timeout_seconds": 600,
       "network": "denied",
-      "evidence_path": ".assurance/evidence/verify-fast.json"
+      "evidence_path": ".assurance/evidence/{branch}/verify-fast.json"
     },
     "verify": {
       "entrypoint": "bash .assurance/tools/verify.sh",
       "timeout_seconds": 3600,
       "network": "allowlisted",
-      "evidence_path": ".assurance/evidence/verify.json"
+      "evidence_path": ".assurance/evidence/{branch}/verify.json"
     },
     "verify-live": {
       "entrypoint": "REPLACE command",
