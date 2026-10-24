@@ -122,13 +122,13 @@
   ],
   "verification_tiers": {
     "verify-fast": {
-      "entrypoint": "REPLACE command",
+      "entrypoint": "bash .assurance/tools/verify-fast.sh",
       "timeout_seconds": 600,
       "network": "denied",
       "evidence_path": ".assurance/evidence/verify-fast.json"
     },
     "verify": {
-      "entrypoint": "REPLACE command",
+      "entrypoint": "bash .assurance/tools/verify.sh",
       "timeout_seconds": 3600,
       "network": "allowlisted",
       "evidence_path": ".assurance/evidence/verify.json"
@@ -352,8 +352,8 @@
       "notable_max_changed_lines": 400,
       "dependency_change_tier": "notable",
       "run_budget": {
-        "currency": "EUR",
-        "amount": 0,
+        "currency": "USD",
+        "amount": 5,
         "max_duration_minutes": 60
       },
       "unclassified_tier": "significant"
