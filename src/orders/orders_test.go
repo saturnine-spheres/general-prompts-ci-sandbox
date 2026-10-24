@@ -52,3 +52,9 @@ func TestCountAndFindShareOrderSet(t *testing.T) {
 		t.Fatalf("Count() = %d, Find resolves %d IDs", got, want)
 	}
 }
+
+func TestExists(t *testing.T) {
+	if !Exists(1) || Exists(2) {
+		t.Fatal("Exists must be true for 1 and false for 2")
+	}
+}

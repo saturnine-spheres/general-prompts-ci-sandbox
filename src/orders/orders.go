@@ -14,3 +14,9 @@ func Find(id int) (string, bool) {
 func Count() int {
 	return len(known)
 }
+
+// Exists reports whether an order ID is known.
+func Exists(id int) bool {
+	_, ok := Find(id)
+	return ok
+}
