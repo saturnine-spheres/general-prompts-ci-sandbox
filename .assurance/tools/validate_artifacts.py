@@ -144,6 +144,8 @@ def validate_instance(
     if isinstance(value, (int, float)) and not isinstance(value, bool):
         if "minimum" in schema and value < schema["minimum"]:
             errors.append(f"{location}: below minimum")
+        if "maximum" in schema and value > schema["maximum"]:
+            errors.append(f"{location}: above maximum")
 
     return errors
 
@@ -203,6 +205,8 @@ def verification_semantic(value: dict[str, Any]) -> bool:
     for check in value["checks"]:
         if "vulnerability_data" in check and check["tool"]["version"] == "unknown":
             return False
+        if check.get("findings") and check["status"] == "pass":
+            return False
     for sentinel in value.get("sentinels", []):
         if sentinel["outcome"] == "not_measured":
             if value["status"] == "pass":
@@ -238,6 +242,51 @@ def run_manifest_semantic(value: dict[str, Any]) -> bool:
             approval["decision"] == "approve" and approval["tier"] == "significant" for approval in value["approvals"]
         ):
             return False
+    return findings_semantic(value.get("findings", []))
+
+
+TICKET_ACTIONS = {"ticket_filed", "commented_existing", "private_advisory"}
+FINDING_ACTIONS = {
+    "introduced": {"fixed", "blocked"},
+    "in_scope_preexisting": {"fixed_in_scope"},
+    "blocking_out_of_scope": {"ticket_filed", "commented_existing", "private_advisory", "withheld", "blocked"},
+    "unrelated": {"ticket_filed", "commented_existing", "private_advisory", "withheld", "observation"},
+    "uncertain": {"observation"},
+}
+
+
+def findings_semantic(findings: list[dict[str, Any]]) -> bool:
+    """Design 8.6 rule table: the action fits the classification, and security findings never reach a public ticket."""
+    identifiers = [item["id"] for item in findings]
+    if len(identifiers) != len(set(identifiers)):
+        return False
+    for item in findings:
+        if item["location"]["start_line"] > item["location"]["end_line"]:
+            return False
+        if item["action"] not in FINDING_ACTIONS[item["classification"]]:
+            return False
+        if item["security"] and item["action"] in {"ticket_filed", "commented_existing"}:
+            return False
+        if (item["ticket"] is not None) != (item["action"] in TICKET_ACTIONS):
+            return False
+    return True
+
+
+def triage_report_semantic(value: dict[str, Any]) -> bool:
+    ranks = sorted(item["rank"] for item in value["tickets"])
+    if ranks != list(range(1, len(ranks) + 1)):
+        return False
+    for item in value["tickets"]:
+        criteria = item["acceptance_criteria"]
+        if criteria["testable"] and not criteria["present"]:
+            return False
+        if item["suitability"] == "ready" and not criteria["testable"]:
+            return False
+        if item["suitability"] == "needs-info" and not item["questions"]:
+            return False
+        decision = (item.get("pickup") or {}).get("decision")
+        if decision == "start" and (value["level"] != 3 or item["suitability"] != "ready" or item["estimated_tier"] != "routine"):
+            return False
     return True
 
 
@@ -260,6 +309,9 @@ def process_contract_semantic(value: dict[str, Any]) -> bool:
 
 
 def profile_semantic(value: dict[str, Any]) -> bool:
+    automation = value.get("ticket_automation")
+    if automation is not None and (automation["level"] == 3) != automation["pickup"]["enabled"]:
+        return False  # autonomous pickup is level 3 and only level 3 (design 8.5, GP-9)
     involvement = value.get("human_involvement")
     if involvement is None:
         return True
@@ -324,6 +376,8 @@ def migration_record_semantic(value: dict[str, Any]) -> bool:
             return False
         if kind == "REMOVE" and value["kind"] != "rollback":
             return False
+        if action["ownership"] == "derived" and kind not in {"ADD", "REPLACE", "RESTORE", "REMOVE", "SKIP"}:
+            return False
         if kind == "ADD" and action["before_digest"] is not None:
             return False
         if applied and kind in {"ADD", "REPLACE", "MERGE", "RESTORE"} and action["after_digest"] is None:
@@ -344,6 +398,12 @@ def gate_result_semantic(value: dict[str, Any]) -> bool:
     if any(item["status"] == "known" and not item["ratchetable"] for item in value["findings"]):
         return False
     return value["status"] != "report_only" or value["mode"] in {"report", "ratchet"}
+
+
+def ticket_intake_semantic(value: dict[str, Any]) -> bool:
+    comment_ids = [item["id"] for item in value["comments"]]
+    linked_ids = [item["id"] for item in value["linked"]]
+    return len(comment_ids) == len(set(comment_ids)) and len(linked_ids) == len(set(linked_ids)) and value["source"]["id"] not in linked_ids
 
 
 def gate_baseline_semantic(value: dict[str, Any]) -> bool:
@@ -402,6 +462,8 @@ def main() -> int:
         "migration-record": schema_dir / "migration-record.schema.json",
         "gate-result": schema_dir / "gate-result.schema.json",
         "gate-baseline": schema_dir / "gate-baseline.schema.json",
+        "ticket-intake": schema_dir / "ticket-intake.schema.json",
+        "triage-report": schema_dir / "triage-report.schema.json",
     }
 
     for name, path in schemas.items():
@@ -498,6 +560,8 @@ def main() -> int:
         ("assurance-system-manifest", schemas["manifest"], lambda value: True),
         ("gate-result", schemas["gate-result"], lambda value: gate_result_semantic(value)),
         ("gate-baseline", schemas["gate-baseline"], lambda value: gate_baseline_semantic(value)),
+        ("ticket-intake", schemas["ticket-intake"], lambda value: ticket_intake_semantic(value)),
+        ("triage-report", schemas["triage-report"], lambda value: triage_report_semantic(value)),
     ]
     explicitly_checked = {"assurance-system-manifest.valid.json", "assurance-system-manifest.invalid.json"}
     for name, schema_path, semantic in fixture_sets:
@@ -637,7 +701,10 @@ def main() -> int:
 
     wrapper_problems: list[str] = []
     for name, markers in {"adapters/github/assurance-gate.yml": ["assurance_gate.py classify", "assurance_gate.py \"${args[@]}\"", "fetch-depth: 0"],
-                          "adapters/gitlab/assurance-gate.gitlab-ci.yml": ["assurance_gate.py classify", "assurance_gate.py \"$@\"", "GIT_DEPTH: \"0\""]}.items():
+                          "adapters/gitlab/assurance-gate.gitlab-ci.yml": ["assurance_gate.py classify", "assurance_gate.py \"$@\"", "GIT_DEPTH: \"0\""],
+                          "adapters/github/assurance-deliver.yml": ["github_forge.py can-act", "async_deliver.py run", "async_deliver.py resume", "fetch-depth: 0"],
+                          "adapters/github/assurance-triage.yml": ["github_forge.py open-issues", "triage.py report", "github_forge.py triage-apply",
+                                                                   "triage.py pickup", "github_forge.py dispatch"]}.items():
         path = root / name
         text = path.read_text(encoding="utf-8-sig") if path.exists() else ""
         wrapper_problems += [f"{name}:{marker}" for marker in markers if marker not in text]
@@ -646,6 +713,40 @@ def main() -> int:
             if used and not re.search(r"@[0-9a-f]{40}$", used.group(1)):
                 wrapper_problems.append(f"{name}: action not pinned to a full commit SHA: {used.group(1)}")
     add_check("ci-gate-wrappers", not wrapper_problems, "GitHub and GitLab wrappers call the forge-neutral gate with full history and pin every action to a commit SHA." if not wrapper_problems else "; ".join(wrapper_problems))
+
+    claude_problems: list[str] = []
+    adapter = root / "adapters/claude-code"
+    try:
+        settings = read_json(adapter / "settings.json")
+        handlers = [handler for groups in settings["hooks"].values() for group in groups for handler in group["hooks"]]
+        if set(settings["hooks"]) != {"PostToolUse", "PreToolUse", "Stop"}:
+            claude_problems.append("settings.json must configure PostToolUse, PreToolUse, and Stop hooks")
+        claude_problems += [f"hook does not call assurance-hook.sh: {handler.get('command')}" for handler in handlers
+                            if handler.get("type") != "command" or "${CLAUDE_PROJECT_DIR}/.claude/hooks/assurance-hook.sh" not in handler.get("command", "")]
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        claude_problems.append(f"settings.json: {exc}")
+
+    def front(path: pathlib.Path) -> str:
+        text = path.read_text(encoding="utf-8-sig") if path.exists() else ""
+        match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n", text, re.S)
+        return match.group(1) if match else ""
+
+    skill = front(adapter / "skills/deliver/SKILL.md")
+    claude_problems += [f"deliver skill frontmatter lacks {marker}" for marker in ("name: deliver", "description:", "disable-model-invocation: true") if marker not in skill]
+    for name in ("assurance-specifier", "assurance-builder", "assurance-reviewer"):
+        head = front(adapter / f"agents/{name}.md")
+        if f"name: {name}" not in head or "description:" not in head:
+            claude_problems.append(f"agents/{name}.md needs name: {name} and a description")
+    reviewer = front(adapter / "agents/assurance-reviewer.md")
+    tools_line = re.search(r"^tools:(.*)$", reviewer, re.M)
+    if not tools_line or re.search(r"\b(Edit|MultiEdit|NotebookEdit)\b", tools_line.group(1)) or "reviewer-write" not in reviewer:
+        claude_problems.append("reviewer must list tools without Edit and scope its writes with the reviewer-write hook")
+    claude_text = (adapter / "CLAUDE.md").read_text(encoding="utf-8-sig") if (adapter / "CLAUDE.md").exists() else ""
+    claude_problems += [f"CLAUDE.md lacks {marker}" for marker in ("@AGENTS.md", "@.assurance/agent-pack.md") if marker not in claude_text]
+    pack_text = (root / "tools/agent_pack.py").read_text(encoding="utf-8-sig") if (root / "tools/agent_pack.py").exists() else ""
+    if "LIMIT = 6144" not in pack_text:
+        claude_problems.append("agent_pack.py must enforce the 6 KiB pack limit")
+    add_check("claude-code-adapter", not claude_problems, "Claude Code adapter: hooks call the entrypoint, the deliver skill is user-invoked, the reviewer cannot edit code, CLAUDE.md imports AGENTS.md and the pack, and the pack is size-limited." if not claude_problems else "; ".join(claude_problems))
 
     version_path = root / "VERSION"
     package_version = version_path.read_text(encoding="utf-8").strip() if version_path.exists() else ""
@@ -677,6 +778,14 @@ def main() -> int:
         "tools/verify-entrypoint.sh", "tools/verify-entrypoint.ps1", "tools/test_scaffold_project.py",
         "tools/assurance_gate.py", "tools/test_assurance_gate.py", "schemas/gate-result.schema.json", "schemas/gate-baseline.schema.json",
         "adapters/github/assurance-gate.yml", "adapters/gitlab/assurance-gate.gitlab-ci.yml", "adapters/gitlab/gitlab_mr.py",
+        "tools/delivery_run.py", "tools/agent_pack.py", "tools/test_claude_adapter.py",
+        "adapters/claude-code/CLAUDE.md", "adapters/claude-code/settings.json", "adapters/claude-code/hooks/assurance-hook.sh",
+        "adapters/claude-code/hooks/assurance_hooks.py", "adapters/claude-code/skills/deliver/SKILL.md",
+        "adapters/claude-code/agents/assurance-specifier.md", "adapters/claude-code/agents/assurance-builder.md", "adapters/claude-code/agents/assurance-reviewer.md",
+        "tools/async_deliver.py", "tools/run_metrics.py", "tools/test_async_deliver.py", "schemas/ticket-intake.schema.json",
+        "adapters/github/assurance-deliver.yml", "adapters/github/ISSUE_TEMPLATE/specification.yml", "adapters/github/github_forge.py",
+        "tools/triage.py", "tools/found_bugs.py", "tools/test_triage.py", "schemas/triage-report.schema.json", "adapters/github/assurance-triage.yml",
+        "tools/build_example.py", "tools/test_build_example.py", "tools/self_eval.py", "tools/test_self_eval.py", "evaluation/textkit-suite/suite.json",
     ]
     missing_required = [name for name in required_files if not (root / name).exists()]
     add_check("required-artifacts-present", not missing_required, "All required top-level artifacts are present." if not missing_required else ", ".join(missing_required))

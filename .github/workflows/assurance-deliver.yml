@@ -1,0 +1,125 @@
+# Asynchronous delivery runs for GitHub issues (general-prompts GitHub adapter).
+# Installed as .github/workflows/assurance-deliver.yml. A maintainer adds the "deliver" label to a specification
+# issue; the run reads the issue, its comments, and linked issues, specifies, builds, verifies, and reviews the
+# change, and opens a pull request linked to the issue. A significant run stops before build until a listed
+# stakeholder comments "/approve" on the issue. A person always merges. Scheduled triage (assurance-triage.yml) may
+# also start a run for a Routine ticket on behalf of the person who labelled it agent-ok.
+#
+# Repository variables:
+#   ASSURANCE_AGENT_RUNS_ON   JSON runs-on value, for example "ubuntu-latest" (default) or ["self-hosted","assurance-local-model"]
+#   ASSURANCE_MODEL_PROVIDER  anthropic (default) or local
+#   ASSURANCE_MODEL           model name; ASSURANCE_MODEL_BASE_URL for a local Anthropic-compatible server
+#   ASSURANCE_CLAUDE_BIN      Claude Code executable on a self-hosted runner (default claude)
+#   ASSURANCE_AGENT_TIMEOUT   seconds per agent call before it counts as a failed attempt (default 3600)
+# Secret: ANTHROPIC_API_KEY for the anthropic provider. Use self-hosted runners only with private repositories.
+name: assurance-deliver
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: Issue number to deliver
+        required: true
+      on_behalf_of:
+        description: Login with write access that made the ticket eligible (set by assurance-triage pickup)
+        required: false
+      routine_only:
+        description: Stop before build unless the planned tier is routine (set by assurance-triage pickup)
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: assurance-deliver-${{ github.event.issue.number || inputs.issue }}
+  cancel-in-progress: false
+
+jobs:
+  deliver:
+    if: >-
+      (github.event_name == 'issues' && github.event.label.name == 'deliver') ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'issue_comment' && !github.event.issue.pull_request && startsWith(github.event.comment.body, '/approve'))
+    runs-on: ${{ fromJSON(vars.ASSURANCE_AGENT_RUNS_ON || '"ubuntu-latest"') }}
+    timeout-minutes: 240
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      ISSUE: ${{ github.event.issue.number || inputs.issue }}
+      ACTOR: ${{ inputs.on_behalf_of || github.event.comment.user.login || github.event.sender.login }}
+      ROUTINE_ONLY: ${{ inputs.routine_only || 'false' }}
+      TARGET: ${{ github.event.repository.default_branch }}
+      ASSURANCE_FORGE: github
+      ASSURANCE_MODEL_PROVIDER: ${{ vars.ASSURANCE_MODEL_PROVIDER || 'anthropic' }}
+      ASSURANCE_MODEL: ${{ vars.ASSURANCE_MODEL }}
+      ASSURANCE_MODEL_BASE_URL: ${{ vars.ASSURANCE_MODEL_BASE_URL }}
+      ASSURANCE_CLAUDE_BIN: ${{ vars.ASSURANCE_CLAUDE_BIN || 'claude' }}
+      ASSURANCE_AGENT_TIMEOUT: ${{ vars.ASSURANCE_AGENT_TIMEOUT || '3600' }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        if: runner.environment == 'github-hosted'
+        with:
+          python-version: "3.12"
+      - name: Install Claude Code when missing
+        if: runner.environment == 'github-hosted'
+        run: command -v "$ASSURANCE_CLAUDE_BIN" >/dev/null || npm install -g @anthropic-ai/claude-code@2.1.310
+
+      - name: Authorize the person who triggered the run
+        run: python3 .assurance/tools/github_forge.py can-act --user "$ACTOR"
+
+      - name: Deliver, or resume after approval
+        run: |
+          set +e
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            git fetch -q origin "+refs/heads/deliver/issue-$ISSUE*:refs/remotes/origin/deliver/issue-$ISSUE*" || { echo "no run branch for issue $ISSUE"; exit 0; }
+            branch=""; run_dir=""
+            for ref in $(git for-each-ref --format='%(refname:short)' "refs/remotes/origin/deliver/issue-$ISSUE*"); do
+              candidate=${ref#origin/}
+              case "$candidate" in "deliver/issue-$ISSUE"|"deliver/issue-$ISSUE"-[0-9]*) ;; *) continue ;; esac
+              git checkout -q -B "$candidate" "$ref"
+              run_dir=$(grep -l '"status": "awaiting_approval"' .assurance/runs/*/run-manifest.json 2>/dev/null | head -n 1 | xargs -r dirname)
+              if [ -n "$run_dir" ]; then branch=$candidate; break; fi
+            done
+            [ -n "$branch" ] || { echo "no run is waiting for approval"; exit 0; }
+            run_id=$(basename "$run_dir")
+            python3 - "$run_dir/run-manifest.json" > run.env <<'EOF'
+          import json, sys
+          manifest = json.load(open(sys.argv[1]))
+          profile = json.load(open(".assurance/project-assurance-profile.json"))
+          stakeholders = profile["human_involvement"]["roles"]["significant"]["stakeholders"]
+          print(f"APPROVED_TIER={manifest['approved_tier']}")
+          print(f"STARTED={manifest['started_at']}")
+          print("STAKEHOLDERS=" + ",".join(stakeholders))
+          EOF
+            . ./run.env && rm run.env
+            python3 .assurance/tools/github_forge.py approvals --issue "$ISSUE" --stakeholders "$STAKEHOLDERS" --after "$STARTED" --output approvals.json
+            python3 - "$run_id" "$APPROVED_TIER" <<'EOF'
+          import json, subprocess, sys
+          for approval in json.load(open("approvals.json")):
+              subprocess.run([sys.executable, ".assurance/tools/delivery_run.py", "approve", "--run", sys.argv[1], "--identity", approval["identity"],
+                              "--role", "stakeholder", "--tier", sys.argv[2], "--reference", approval["reference"]], check=True)
+          EOF
+            rm -f approvals.json
+            grep -q '"status": "running"' "$run_dir/run-manifest.json" || { echo "approval not sufficient yet"; exit 0; }
+            git -c user.name=assurance-agent -c user.email=assurance-agent@users.noreply.github.com commit -q -am "Record stakeholder approval for issue #$ISSUE"
+            git push -q origin "$branch"
+            python3 .assurance/tools/async_deliver.py resume --run "$run_id" --target "$TARGET"
+          else
+            python3 .assurance/tools/github_forge.py intake --issue "$ISSUE" --output "$RUNNER_TEMP/intake.json" || exit 2
+            extra=""; [ "$ROUTINE_ONLY" = "true" ] && extra="--routine-only"
+            python3 .assurance/tools/async_deliver.py run --intake "$RUNNER_TEMP/intake.json" --target "$TARGET" $extra
+          fi
+          code=$?
+          if [ "$code" -eq 3 ]; then echo "paused for approval"; exit 0; fi
+          exit "$code"

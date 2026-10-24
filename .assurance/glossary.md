@@ -6,6 +6,10 @@ These definitions constrain claims made by agents, developers, reviewers, and au
 
 A numbered, observable behaviour of a work item that a user or caller would notice, stated so review can judge it `met`, `not_met`, or `not_verifiable`. Tests passing, lint, and coverage are gates, not acceptance criteria. A review that approves cannot carry a `not_met` verdict.
 
+## Agent pack
+
+A generated summary of at most 6 KiB that a coding agent loads next to `AGENTS.md`: the repository's verifier commands, tier rules, process stages, delivery rules, stop conditions, and blocking control IDs, rendered from the installed profile, process contract, verifier configuration, and catalog. It carries no authority of its own and is regenerated whenever those files change.
+
 ## Architecture diagram
 
 A version-controlled, renderable model of one declared structural view—system context, component/dependency, deployment/environment, or data-flow/trust-boundary—with stable node/flow IDs and traceability to contracts, implementation/configuration, tests, ownership, and deployment evidence. A diagram is current only when its review age and diagram-to-reality drift checks satisfy the profile.

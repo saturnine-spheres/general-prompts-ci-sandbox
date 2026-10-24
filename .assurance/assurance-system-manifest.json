@@ -2,10 +2,10 @@
   "schema_version": "1.1.0",
   "system": {
     "id": "development-assurance-system",
-    "version": "1.5.0",
+    "version": "2.0.1",
     "source": "C:\\Users\\ville\\saturnine-spheres\\general-prompts",
     "source_revision": "unknown:local-distribution-no-immutable-revision",
-    "distribution_digest": "sha256:d629aaecc0c287bf27d993f79b2c181809f4c85720595a767c40a0756d7e3dbe"
+    "distribution_digest": "sha256:5905e0c35f596a22ce7761becd0a9962d922dc9ffb0576678ef281eb67992175"
   },
   "installation": {
     "mode": "existing",
@@ -49,10 +49,10 @@
     {
       "path": ".assurance/process.json",
       "upstream_path": "process-contract.template.json",
-      "upstream_digest": "sha256:07d399d40331fa0d84ed2eba5bc3f9e93d3f059e31de45552b08eb7b9e1cdaf7",
+      "upstream_digest": "sha256:4e1ebdc4dfb67596e7b8ca60e62c7adf0820df161f525224b8866c7e5c7b6f59",
       "installed_digest": "sha256:07d399d40331fa0d84ed2eba5bc3f9e93d3f059e31de45552b08eb7b9e1cdaf7",
       "ownership": "project-owned",
-      "local_changes": false
+      "local_changes": true
     },
     {
       "path": ".assurance/control-catalog.yaml",
@@ -89,24 +89,24 @@
     {
       "path": ".assurance/glossary.md",
       "upstream_path": "glossary.md",
-      "upstream_digest": "sha256:a7d0ef687344ecd4f33c2c19b3a9ab09bc934c030810aaa0a17e42e71a38504c",
-      "installed_digest": "sha256:a7d0ef687344ecd4f33c2c19b3a9ab09bc934c030810aaa0a17e42e71a38504c",
+      "upstream_digest": "sha256:0625adf1b6bb21e6e7a097852d08b2276acf48c34f864c6783a8bd18b7684e45",
+      "installed_digest": "sha256:0625adf1b6bb21e6e7a097852d08b2276acf48c34f864c6783a8bd18b7684e45",
       "ownership": "merge-managed",
       "local_changes": false
     },
     {
       "path": ".assurance/installation-and-update-guide.md",
       "upstream_path": "installation-and-update-guide.md",
-      "upstream_digest": "sha256:fa7aa743434209dc805e1dbb9dca1b62a7458dac1a6336dff9577d9ec1448a91",
-      "installed_digest": "sha256:fa7aa743434209dc805e1dbb9dca1b62a7458dac1a6336dff9577d9ec1448a91",
+      "upstream_digest": "sha256:8f8f092a1bce6516ff5dbfec184bba9736d7248f7792e8982114d99a5f9d2f92",
+      "installed_digest": "sha256:8f8f092a1bce6516ff5dbfec184bba9736d7248f7792e8982114d99a5f9d2f92",
       "ownership": "merge-managed",
       "local_changes": false
     },
     {
       "path": ".assurance/schemas/project-assurance-profile.schema.json",
       "upstream_path": "schemas/project-assurance-profile.schema.json",
-      "upstream_digest": "sha256:692942e24affc13e6841da78abeb4df85a300b9376b046b14f8221c7a25409f5",
-      "installed_digest": "sha256:692942e24affc13e6841da78abeb4df85a300b9376b046b14f8221c7a25409f5",
+      "upstream_digest": "sha256:f2fcad8c22b62d0e9494d72c40ed7cee27df02b2ed8b4cd007525beacf780606",
+      "installed_digest": "sha256:f2fcad8c22b62d0e9494d72c40ed7cee27df02b2ed8b4cd007525beacf780606",
       "ownership": "upstream-managed",
       "local_changes": false
     },
@@ -137,8 +137,8 @@
     {
       "path": ".assurance/schemas/verification-result.schema.json",
       "upstream_path": "schemas/verification-result.schema.json",
-      "upstream_digest": "sha256:cc514be26d741d1030595cee94779b7af6659e287e17824dce63ec6e66dcbb72",
-      "installed_digest": "sha256:cc514be26d741d1030595cee94779b7af6659e287e17824dce63ec6e66dcbb72",
+      "upstream_digest": "sha256:a7ed21f4d9b3950313d9c2aad81effa848903ec0d5ae31fb4cc0eeab5e6a69f8",
+      "installed_digest": "sha256:a7ed21f4d9b3950313d9c2aad81effa848903ec0d5ae31fb4cc0eeab5e6a69f8",
       "ownership": "upstream-managed",
       "local_changes": false
     },
@@ -169,8 +169,8 @@
     {
       "path": ".assurance/schemas/run-manifest.schema.json",
       "upstream_path": "schemas/run-manifest.schema.json",
-      "upstream_digest": "sha256:7e95aa515ee8d39e113184b9354c86b59c6566fcca6de1db6248f1b7a2a9b582",
-      "installed_digest": "sha256:7e95aa515ee8d39e113184b9354c86b59c6566fcca6de1db6248f1b7a2a9b582",
+      "upstream_digest": "sha256:42980e0da3ca9c6078c9a628c1ff736e5fc028d9792a41268899feee81738d0e",
+      "installed_digest": "sha256:42980e0da3ca9c6078c9a628c1ff736e5fc028d9792a41268899feee81738d0e",
       "ownership": "upstream-managed",
       "local_changes": false
     },
@@ -185,24 +185,24 @@
     {
       "path": ".assurance/schemas/verifier-config.schema.json",
       "upstream_path": "schemas/verifier-config.schema.json",
-      "upstream_digest": "sha256:3b8d0fb67619bf8279753bf8ba84e0192c941202de17c88c59698cbbbefa6408",
-      "installed_digest": "sha256:3b8d0fb67619bf8279753bf8ba84e0192c941202de17c88c59698cbbbefa6408",
+      "upstream_digest": "sha256:45ac06d0be4dd11dc3d47114d895cf8af5cf44c01b51701d789716ee5575502a",
+      "installed_digest": "sha256:45ac06d0be4dd11dc3d47114d895cf8af5cf44c01b51701d789716ee5575502a",
       "ownership": "upstream-managed",
       "local_changes": false
     },
     {
       "path": ".assurance/schemas/migration-record.schema.json",
       "upstream_path": "schemas/migration-record.schema.json",
-      "upstream_digest": "sha256:1ec112b119fdf43ee64e03c4d183f9d89c777a4524531bf4b443cfb09a3ae3af",
-      "installed_digest": "sha256:1ec112b119fdf43ee64e03c4d183f9d89c777a4524531bf4b443cfb09a3ae3af",
+      "upstream_digest": "sha256:e1c702f540da7cd0271906b7dfe842a249ff5dfde44d07894ac0f97cf42709cf",
+      "installed_digest": "sha256:e1c702f540da7cd0271906b7dfe842a249ff5dfde44d07894ac0f97cf42709cf",
       "ownership": "upstream-managed",
       "local_changes": false
     },
     {
       "path": ".assurance/tools/validate-artifacts.ps1",
       "upstream_path": "tools/validate-artifacts.ps1",
-      "upstream_digest": "sha256:24a7a70d152fdc82e0f1d2638b01312bf888036fb4db51eca8c3d013e8bda843",
-      "installed_digest": "sha256:24a7a70d152fdc82e0f1d2638b01312bf888036fb4db51eca8c3d013e8bda843",
+      "upstream_digest": "sha256:cf431f9c9e9b8563e408e741ea89bcda091c3591c740f90b70dbe3c48a3d7633",
+      "installed_digest": "sha256:cf431f9c9e9b8563e408e741ea89bcda091c3591c740f90b70dbe3c48a3d7633",
       "ownership": "upstream-managed",
       "local_changes": false
     },
@@ -217,8 +217,8 @@
     {
       "path": ".assurance/tools/validate_artifacts.py",
       "upstream_path": "tools/validate_artifacts.py",
-      "upstream_digest": "sha256:b28fc5322b812555fbc1dd51ac4a86be94503ec9cf68560b78ba61dddae1c616",
-      "installed_digest": "sha256:b28fc5322b812555fbc1dd51ac4a86be94503ec9cf68560b78ba61dddae1c616",
+      "upstream_digest": "sha256:352796e4c56b9619dc9377694b7dd7f6dc1a9e3b1595251daecefa1d64930932",
+      "installed_digest": "sha256:352796e4c56b9619dc9377694b7dd7f6dc1a9e3b1595251daecefa1d64930932",
       "ownership": "upstream-managed",
       "local_changes": false
     },
@@ -241,24 +241,24 @@
     {
       "path": ".assurance/tools/validate_installed_assurance.py",
       "upstream_path": "tools/validate_installed_assurance.py",
-      "upstream_digest": "sha256:498a690e3ed0c271b8b8bf64d72acd068d5f5c4122db2bc40ea33c334cc46a86",
-      "installed_digest": "sha256:498a690e3ed0c271b8b8bf64d72acd068d5f5c4122db2bc40ea33c334cc46a86",
+      "upstream_digest": "sha256:979db2af489b133c42ffe2cbf5ebb85f7a11b9d465dea3f4d12bce47dfdcbb72",
+      "installed_digest": "sha256:979db2af489b133c42ffe2cbf5ebb85f7a11b9d465dea3f4d12bce47dfdcbb72",
       "ownership": "upstream-managed",
       "local_changes": false
     },
     {
       "path": ".assurance/tools/run_verifier.py",
       "upstream_path": "tools/run_verifier.py",
-      "upstream_digest": "sha256:07a995cbd26b22d8c6bac0ad30c49c704ecf71afb4809174bcc03f94471773b9",
-      "installed_digest": "sha256:07a995cbd26b22d8c6bac0ad30c49c704ecf71afb4809174bcc03f94471773b9",
+      "upstream_digest": "sha256:2b88064e2c20d14c2c34d52f24a0ec885fe291f87f3d0370cb6795ad24bdf0a1",
+      "installed_digest": "sha256:2b88064e2c20d14c2c34d52f24a0ec885fe291f87f3d0370cb6795ad24bdf0a1",
       "ownership": "upstream-managed",
       "local_changes": false
     },
     {
       "path": ".assurance/tools/assurance_gate.py",
       "upstream_path": "tools/assurance_gate.py",
-      "upstream_digest": "sha256:4019875cd7d7fc6f96f4f6cc5f7c8b731437b340b395c1bd4d7c5ebfb58db12f",
-      "installed_digest": "sha256:4019875cd7d7fc6f96f4f6cc5f7c8b731437b340b395c1bd4d7c5ebfb58db12f",
+      "upstream_digest": "sha256:b80dd3c44b420e8d77303558d59db35a0c46a6ae79f18452ef06f34e1f319dfb",
+      "installed_digest": "sha256:b80dd3c44b420e8d77303558d59db35a0c46a6ae79f18452ef06f34e1f319dfb",
       "ownership": "upstream-managed",
       "local_changes": false
     },
@@ -298,9 +298,9 @@
       "path": ".assurance/verifiers.json",
       "upstream_path": "generated:verifier-starter:go",
       "upstream_digest": "sha256:196863821e49f38f9b12a92360cb5596d4deef1886c52af47fefc594afa31f39",
-      "installed_digest": "sha256:196863821e49f38f9b12a92360cb5596d4deef1886c52af47fefc594afa31f39",
+      "installed_digest": "sha256:9b20067f7f089dcc4401d218b7b533ed570b33ab4a7dba13901666245f649e30",
       "ownership": "project-owned",
-      "local_changes": false
+      "local_changes": true
     },
     {
       "path": ".assurance/tools/verify-fast.sh",
@@ -313,8 +313,8 @@
     {
       "path": ".assurance/tools/verify-fast.ps1",
       "upstream_path": "tools/verify-entrypoint.ps1",
-      "upstream_digest": "sha256:4c36a84ab96022779fddc4dfc2fb2104a549dcc36e78b9f2c4e45864acb7b0fb",
-      "installed_digest": "sha256:4c36a84ab96022779fddc4dfc2fb2104a549dcc36e78b9f2c4e45864acb7b0fb",
+      "upstream_digest": "sha256:326943383137a903a4a12c4b5efd45248ae396b57e842b2421db8cfd3263b75a",
+      "installed_digest": "sha256:326943383137a903a4a12c4b5efd45248ae396b57e842b2421db8cfd3263b75a",
       "ownership": "upstream-managed",
       "local_changes": false
     },
@@ -329,9 +329,105 @@
     {
       "path": ".assurance/tools/verify.ps1",
       "upstream_path": "tools/verify-entrypoint.ps1",
-      "upstream_digest": "sha256:4c36a84ab96022779fddc4dfc2fb2104a549dcc36e78b9f2c4e45864acb7b0fb",
-      "installed_digest": "sha256:4c36a84ab96022779fddc4dfc2fb2104a549dcc36e78b9f2c4e45864acb7b0fb",
+      "upstream_digest": "sha256:326943383137a903a4a12c4b5efd45248ae396b57e842b2421db8cfd3263b75a",
+      "installed_digest": "sha256:326943383137a903a4a12c4b5efd45248ae396b57e842b2421db8cfd3263b75a",
       "ownership": "upstream-managed",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/tools/delivery_run.py",
+      "upstream_path": "tools/delivery_run.py",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:bd723d9beffc97b80ad3cc7d379cc34a2de9c0c03629b1fc282359d99cbf127c",
+      "installed_digest": "sha256:bd723d9beffc97b80ad3cc7d379cc34a2de9c0c03629b1fc282359d99cbf127c",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/tools/agent_pack.py",
+      "upstream_path": "tools/agent_pack.py",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:eb3053347279fb88f8a7bd5d54bcf4d3d56a4853f37c5bba76367598bc363a45",
+      "installed_digest": "sha256:eb3053347279fb88f8a7bd5d54bcf4d3d56a4853f37c5bba76367598bc363a45",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/tools/async_deliver.py",
+      "upstream_path": "tools/async_deliver.py",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:e2392b89f3efa24a5f7aaecf3148eade6cca8aef3f2232aba1014083b5a5c469",
+      "installed_digest": "sha256:e2392b89f3efa24a5f7aaecf3148eade6cca8aef3f2232aba1014083b5a5c469",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/tools/run_metrics.py",
+      "upstream_path": "tools/run_metrics.py",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:190ca073b9c5115bc2a8d35467a661e77d4473883dab0e12c9358e09e2ef50a0",
+      "installed_digest": "sha256:190ca073b9c5115bc2a8d35467a661e77d4473883dab0e12c9358e09e2ef50a0",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/schemas/ticket-intake.schema.json",
+      "upstream_path": "schemas/ticket-intake.schema.json",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:f85693e0d762b5202e8db9787243c16e3330f0886f83524fbf1ad4149f963fc1",
+      "installed_digest": "sha256:f85693e0d762b5202e8db9787243c16e3330f0886f83524fbf1ad4149f963fc1",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/tools/triage.py",
+      "upstream_path": "tools/triage.py",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:00873801b69e53feb257bb812b2e3ff517364c9a7af7af0a1d5dd549d9f72591",
+      "installed_digest": "sha256:00873801b69e53feb257bb812b2e3ff517364c9a7af7af0a1d5dd549d9f72591",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/tools/found_bugs.py",
+      "upstream_path": "tools/found_bugs.py",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:89567a1a838bbbc1e1694c893f6e12577395651fe85ec2252cfe88b51eded362",
+      "installed_digest": "sha256:89567a1a838bbbc1e1694c893f6e12577395651fe85ec2252cfe88b51eded362",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/schemas/triage-report.schema.json",
+      "upstream_path": "schemas/triage-report.schema.json",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:006ccaa39b1fd0d364259f10244211241837b3497728da88b405e23dc84ca49b",
+      "installed_digest": "sha256:006ccaa39b1fd0d364259f10244211241837b3497728da88b405e23dc84ca49b",
+      "local_changes": false
+    },
+    {
+      "path": ".github/workflows/assurance-deliver.yml",
+      "upstream_path": "adapters/github/assurance-deliver.yml",
+      "ownership": "merge-managed",
+      "upstream_digest": "sha256:6aa4b50fc05782ef2f79befc80024630f03b747b305ac38d8b0633a5144ad0f5",
+      "installed_digest": "sha256:6aa4b50fc05782ef2f79befc80024630f03b747b305ac38d8b0633a5144ad0f5",
+      "local_changes": false
+    },
+    {
+      "path": ".github/workflows/assurance-triage.yml",
+      "upstream_path": "adapters/github/assurance-triage.yml",
+      "ownership": "merge-managed",
+      "upstream_digest": "sha256:536f4b7372ba37adb5a732e2eadbf78d476700e6fdf796413f2993642559b4aa",
+      "installed_digest": "sha256:536f4b7372ba37adb5a732e2eadbf78d476700e6fdf796413f2993642559b4aa",
+      "local_changes": false
+    },
+    {
+      "path": ".github/ISSUE_TEMPLATE/specification.yml",
+      "upstream_path": "adapters/github/ISSUE_TEMPLATE/specification.yml",
+      "ownership": "merge-managed",
+      "upstream_digest": "sha256:85738feb2b8287a912d589976452086bf64aa2242b99b0b05f161f04457ca8b9",
+      "installed_digest": "sha256:85738feb2b8287a912d589976452086bf64aa2242b99b0b05f161f04457ca8b9",
+      "local_changes": false
+    },
+    {
+      "path": ".assurance/tools/github_forge.py",
+      "upstream_path": "adapters/github/github_forge.py",
+      "ownership": "upstream-managed",
+      "upstream_digest": "sha256:e63d52c6e0befe43b315918401b70d2f84d876651834d17cdc77963090014388",
+      "installed_digest": "sha256:e63d52c6e0befe43b315918401b70d2f84d876651834d17cdc77963090014388",
       "local_changes": false
     }
   ],
@@ -356,6 +452,15 @@
       "record": ".assurance/migrations/MIG-20261024T095638Z-f6feb653.json",
       "result": "applied",
       "migration_id": "MIG-20261024T095638Z-f6feb653"
+    },
+    {
+      "from_version": "1.5.0",
+      "to_version": "2.0.1",
+      "changed_at": "2026-10-24T16:15:28.891933Z",
+      "owner": "saturnine-spheres",
+      "record": ".assurance/migrations/MIG-20261024T161528Z-91a22225.json",
+      "result": "applied",
+      "migration_id": "MIG-20261024T161528Z-91a22225"
     }
   ]
 }

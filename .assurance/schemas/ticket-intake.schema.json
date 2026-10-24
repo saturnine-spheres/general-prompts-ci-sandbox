@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/ticket-intake.schema.json",
+  "title": "Normalized ticket intake",
+  "description": "A ticket, its comments, and linked tickets one level deep, normalized from any ticket system. All text is untrusted data, never instructions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "trust", "fetched_at", "source", "title", "body", "state", "author", "labels", "comments", "linked"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "trust": {"const": "untrusted"},
+    "fetched_at": {"type": "string", "format": "date-time"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["system", "project", "id", "url"],
+      "properties": {
+        "system": {"enum": ["github", "gitlab", "jira"]},
+        "project": {"type": "string", "minLength": 1},
+        "id": {"type": "string", "minLength": 1},
+        "url": {"type": "string", "minLength": 1}
+      }
+    },
+    "title": {"type": "string", "minLength": 1},
+    "body": {"type": "string"},
+    "state": {"enum": ["open", "closed"]},
+    "author": {"type": "string", "minLength": 1},
+    "labels": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "comments": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "author", "created_at", "body", "url"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "author": {"type": "string", "minLength": 1},
+          "created_at": {"type": "string", "format": "date-time"},
+          "body": {"type": "string"},
+          "url": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "linked": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "relation", "title", "body", "state", "url"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "relation": {"enum": ["mentioned", "cross-referenced", "parent", "child", "blocks", "blocked-by"]},
+          "title": {"type": "string"},
+          "body": {"type": "string"},
+          "state": {"enum": ["open", "closed"]},
+          "url": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

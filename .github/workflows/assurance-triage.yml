@@ -1,0 +1,77 @@
+# Scheduled ticket triage and guarded pickup (general-prompts GitHub adapter, design section 8.5).
+# Installed as .github/workflows/assurance-triage.yml. The level comes from ticket_automation in
+# .assurance/project-assurance-profile.json:
+#   1  the job writes a ranked shortlist to the run summary and changes nothing on tickets
+#   2  it also sets one agent:* label per ticket and posts one comment with clarifying questions when they change
+#   3  it also starts delivery runs for Routine tickets that a person with write access labelled with an
+#      eligibility label (default agent-ok), within the concurrency limit, daily budget, and two attempts.
+#      Notable and significant tickets are never started automatically, and every run ends as a pull request
+#      that a person reviews and merges.
+# Triage uses deterministic text rules, not a model, so it needs no API key and ticket text cannot steer it.
+#
+# Repository variables: ASSURANCE_TRIAGE_RUNS_ON (JSON runs-on, default "ubuntu-latest"),
+# ASSURANCE_MODEL_PROVIDER (local runs count as zero spend toward the daily budget).
+name: assurance-triage
+
+on:
+  schedule:
+    - cron: "23 6 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  actions: write
+
+concurrency:
+  group: assurance-triage
+  cancel-in-progress: false
+
+jobs:
+  triage:
+    runs-on: ${{ fromJSON(vars.ASSURANCE_TRIAGE_RUNS_ON || '"ubuntu-latest"') }}
+    timeout-minutes: 30
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      ASSURANCE_MODEL_PROVIDER: ${{ vars.ASSURANCE_MODEL_PROVIDER || 'anthropic' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        if: runner.environment == 'github-hosted'
+        with:
+          python-version: "3.12"
+
+      - name: Read open issues
+        run: python3 .assurance/tools/github_forge.py open-issues --output-dir "$RUNNER_TEMP/tickets"
+
+      - name: Triage
+        run: python3 .assurance/tools/triage.py report --intake-dir "$RUNNER_TEMP/tickets" --output "$RUNNER_TEMP/triage.json" --markdown "$GITHUB_STEP_SUMMARY"
+
+      - name: Pick up eligible Routine tickets (level 3)
+        run: |
+          python3 - > pickup.env <<'EOF'
+          import json, os
+          profile = json.load(open(".assurance/project-assurance-profile.json"))
+          automation = profile.get("ticket_automation") or {}
+          pickup = automation.get("pickup") or {}
+          budget = ((profile.get("human_involvement") or {}).get("tier_rules") or {}).get("run_budget", {}).get("amount", 0)
+          print("LEVEL=" + str(automation.get("level", 1)))
+          print("LABELS=" + ",".join(pickup.get("eligibility_labels", ["agent-ok"])))
+          print("PER_RUN=" + ("0" if os.environ["ASSURANCE_MODEL_PROVIDER"] == "local" else str(budget)))
+          EOF
+          . ./pickup.env && rm pickup.env
+          [ "$LEVEL" = "3" ] || { echo "pickup is off (level $LEVEL)"; exit 0; }
+          python3 .assurance/tools/github_forge.py pickup-context --report "$RUNNER_TEMP/triage.json" --labels "$LABELS" --per-run-cost "$PER_RUN" --output "$RUNNER_TEMP/context.json"
+          python3 .assurance/tools/triage.py pickup --report "$RUNNER_TEMP/triage.json" --context "$RUNNER_TEMP/context.json" --markdown "$GITHUB_STEP_SUMMARY" > "$RUNNER_TEMP/start.txt"
+          python3 - "$RUNNER_TEMP/context.json" "$RUNNER_TEMP/start.txt" > "$RUNNER_TEMP/dispatch.txt" <<'EOF'
+          import json, sys
+          context = json.load(open(sys.argv[1]))
+          for ticket in open(sys.argv[2]).read().split():
+              print(ticket, context["eligible_by"][ticket])
+          EOF
+          while read -r issue login; do
+            python3 .assurance/tools/github_forge.py dispatch --issue "$issue" --on-behalf-of "$login"
+          done < "$RUNNER_TEMP/dispatch.txt"
+
+      - name: Label tickets and ask questions (level 2 and 3)
+        run: python3 .assurance/tools/github_forge.py triage-apply --report "$RUNNER_TEMP/triage.json"

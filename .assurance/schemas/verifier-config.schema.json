@@ -28,7 +28,8 @@
       "type": "object", "additionalProperties": false,
       "required": ["output", "network", "container", "checks"],
       "properties": {
-        "output": {"type": "string", "pattern": "^\\.assurance/(?!(?:.*/)?\\.\\.(?:/|$))[A-Za-z0-9._/-]+\\.json$"},
+        "output": {"type": "string", "pattern": "^\\.assurance/(?!(?:.*/)?\\.\\.(?:/|$))(?:[A-Za-z0-9._/-]|\\{(?:branch|tier|revision)\\})+\\.json$",
+                   "description": "Record path. {branch} (the current branch, slugged), {tier}, and {revision} (12 hex digits of the commit) are replaced when the verifier runs; a per-branch path keeps concurrent changes from conflicting."},
         "network": {"enum": ["denied", "allowlisted"]},
         "container": {
           "type": ["object", "null"], "additionalProperties": false,

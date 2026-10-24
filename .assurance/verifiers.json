@@ -5,7 +5,7 @@
   "generated_by": "general-prompts verifier starter; review and adapt the commands",
   "tiers": {
     "verify-fast": {
-      "output": ".assurance/evidence/verify-fast.json",
+      "output": ".assurance/evidence/{branch}/{tier}.json",
       "network": "denied",
       "container": null,
       "checks": [
@@ -52,7 +52,7 @@
       ]
     },
     "verify": {
-      "output": ".assurance/evidence/verify.json",
+      "output": ".assurance/evidence/{branch}/{tier}.json",
       "network": "denied",
       "container": null,
       "checks": [

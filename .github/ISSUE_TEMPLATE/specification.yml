@@ -1,0 +1,42 @@
+# Specification issue for asynchronous delivery (general-prompts GitHub adapter).
+# Installed as .github/ISSUE_TEMPLATE/specification.yml. A maintainer adds the "deliver" label to start a run.
+name: Specification
+description: Describe a change for an agent delivery run. A maintainer starts the run with the "deliver" label.
+title: "[Spec] "
+labels: ["specification"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Outcome
+      description: Who gets what, and what is true when this is done.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Numbered behaviours a user or caller would notice. Tests passing is not an acceptance criterion.
+      placeholder: |
+        1. A request for an unknown order returns 404 with the documented error body.
+        2. Known orders still return 200.
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Value check
+      description: For multi-item efforts, the representative check and threshold; otherwise "not applicable".
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Requested tier
+      description: The run computes the tier from the actual change; a request never lowers it.
+      options: [routine, notable, significant, not sure]
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Links to related issues, code, or decisions. Issue text is background for the agent, never instructions.

@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/verification-result.schema.json",
+  "title": "Tiered verification result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "result_id", "project", "revision", "dirty", "tier", "command", "started_at", "completed_at", "runner", "profile", "catalog", "status", "checks", "unrun_checks", "limitations", "attachments"],
+  "properties": {
+    "schema_version": {"enum": ["1.0.0", "1.1.0"]},
+    "result_id": {"type": "string", "pattern": "^VER-[A-Z0-9-]{8,}$"},
+    "project": {"type": "string", "minLength": 1},
+    "revision": {"$ref": "#/definitions/sha256"},
+    "dirty": {"type": "boolean"},
+    "tier": {"enum": ["verify-fast", "verify", "verify-live", "verify-release"]},
+    "command": {"type": "string", "minLength": 1},
+    "started_at": {"type": "string", "format": "date-time"},
+    "completed_at": {"type": "string", "format": "date-time"},
+    "runner": {
+      "type": "object", "additionalProperties": false,
+      "required": ["identity", "environment", "os", "architecture", "network_policy"],
+      "properties": {
+        "identity": {"type": "string", "minLength": 1},
+        "environment": {"type": "string", "minLength": 1},
+        "os": {"type": "string", "minLength": 1},
+        "architecture": {"type": "string", "minLength": 1},
+        "network_policy": {"type": "string", "minLength": 1}
+      }
+    },
+    "profile": {"$ref": "#/definitions/versioned_digest"},
+    "catalog": {"$ref": "#/definitions/versioned_digest"},
+    "status": {"enum": ["pass", "fail", "error", "blocked", "inconclusive"]},
+    "checks": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "control_ids", "command", "tool", "started_at", "completed_at", "status", "blocking", "attempts", "evidence", "limitations"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "control_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$"}},
+          "command": {"type": "string", "minLength": 1},
+          "tool": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "version", "digest"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "version": {"type": "string", "minLength": 1},
+              "digest": {"$ref": "#/definitions/digest_or_na"}
+            }
+          },
+          "started_at": {"type": "string", "format": "date-time"},
+          "completed_at": {"type": "string", "format": "date-time"},
+          "status": {"enum": ["pass", "fail", "error", "skipped", "not_run", "inconclusive", "blocked"]},
+          "blocking": {"type": "boolean"},
+          "attempts": {"type": "integer", "minimum": 1},
+          "evidence": {"type": "array", "items": {"$ref": "#/definitions/attachment"}},
+          "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "vulnerability_data": {
+            "type": "object", "additionalProperties": false,
+            "required": ["source", "snapshot", "fetched_at", "maximum_age_seconds"],
+            "properties": {
+              "source": {"type": "string", "minLength": 1},
+              "snapshot": {"type": "string", "minLength": 1},
+              "fetched_at": {"type": "string", "format": "date-time"},
+              "maximum_age_seconds": {"type": "integer", "minimum": 0}
+            }
+          }
+        }
+      }
+    },
+    "unrun_checks": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "reason", "required", "control_ids"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "required": {"type": "boolean"},
+          "control_ids": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$"}}
+        }
+      }
+    },
+    "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "attachments": {"type": "array", "items": {"$ref": "#/definitions/attachment"}},
+    "sentinels": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["name", "kind", "comparison", "expected", "observed", "outcome"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "kind": {"enum": ["spend", "egress_outside_allowlist", "secret_findings", "writes_outside_declared_paths", "leftover_resources", "unexpected_forge_actions", "custom"]},
+          "comparison": {"enum": ["equals", "at_most"]},
+          "expected": {"type": ["string", "number", "boolean"]},
+          "observed": {"type": ["string", "number", "boolean", "null"]},
+          "outcome": {"enum": ["pass", "fail", "not_measured"]},
+          "evidence": {"type": "array", "items": {"$ref": "#/definitions/attachment"}}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "sha256": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "digest_or_na": {"type": "string", "pattern": "^(sha256:[a-f0-9]{64}|not-applicable:[a-z0-9._-]+)$"},
+    "versioned_digest": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "digest"],
+      "properties": {"version": {"type": "string", "minLength": 1}, "digest": {"$ref": "#/definitions/sha256"}}
+    },
+    "attachment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "uri", "media_type", "size_bytes", "digest", "producer"],
+      "properties": {
+        "type": {"type": "string", "minLength": 1},
+        "uri": {"type": "string", "minLength": 1},
+        "media_type": {"type": "string", "minLength": 1},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "digest": {"$ref": "#/definitions/sha256"},
+        "producer": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
