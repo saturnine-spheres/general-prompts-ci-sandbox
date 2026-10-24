@@ -1,0 +1,285 @@
+{
+  "artifacts": [
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/change-summary.md",
+      "digest": "sha256:af7406a2c9ec9855d8ae1070761bfde8d50bb3a03ab49135b5d6aec1d996700a",
+      "bytes": 1185
+    },
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/classification.json",
+      "digest": "sha256:d5f0eeff97add8524d4726e7c1d81ac3ecdf5541eb0d1fb255dd7cef94c2e4d3",
+      "bytes": 597
+    },
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/intent.md",
+      "digest": "sha256:4ac4d4ed42922274de40c70c2c95a6d34c72de66d19d3c88da0b71951b47b87e",
+      "bytes": 432
+    },
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/plan.md",
+      "digest": "sha256:8fbf66a5d4f5838ccad17cbd13742aae1d4b5ed5d02cd3816e438818db163325",
+      "bytes": 531
+    },
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/reclassification.json",
+      "digest": "sha256:a50bca608bec188753ef0add59e463106ea2a997c81082a5640892ef178a0254",
+      "bytes": 1090
+    },
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/review-findings.json",
+      "digest": "sha256:bd8e4c56296ffd60524b4b333dce6b113ae9c45a5f4a2192a3859ea66e04730f",
+      "bytes": 2535
+    },
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/review-record.json",
+      "digest": "sha256:8306fad4399f11d4e0cd57b0f46e4ae3743eeb52344e967bbcdbdbe42dc795e5",
+      "bytes": 5872
+    },
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/spec.md",
+      "digest": "sha256:b45be520c9d08f532b20e66e4a3de811e2655a60db28dd4ff60528782e44b47a",
+      "bytes": 3259
+    },
+    {
+      "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verification-result.json",
+      "digest": "sha256:c3ba80b3392a26645770925f508e37a03cf74ad234d941a6d9bf4d82114dbfca",
+      "bytes": 1507
+    }
+  ],
+  "definition": {
+    "digest": "sha256:b3b5cfb93dc1b875a80d764357f212a2cbdb83a8293874affcebfcc228590bef",
+    "pipeline_id": "pipe_v0_default_delivery",
+    "revision": 1
+  },
+  "generated_at": "2026-10-24T18:14:56.489074Z",
+  "organization_id": "v0-team",
+  "repository": {
+    "base_branch": "main",
+    "base_commit": "66bf92ad73af195fdeecacbd4f3c55ba20ecbc76",
+    "full_name": "saturnine-spheres/general-prompts-ci-sandbox",
+    "run_branch": "praxis/run/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5"
+  },
+  "run_id": "prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5",
+  "schema_version": "1.0",
+  "stages": [
+    {
+      "node_id": "intake",
+      "node_run_id": "pnr_7e0075f1722381f2378f7d59807dd4f7aa351719",
+      "attempt": 1,
+      "actor_class": "system",
+      "outcome": "accepted",
+      "started_at": "2026-10-24T18:13:33.777615Z",
+      "duration_ms": 914,
+      "input_artifacts": [],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/intent.md",
+          "digest": "sha256:4ac4d4ed42922274de40c70c2c95a6d34c72de66d19d3c88da0b71951b47b87e"
+        }
+      ]
+    },
+    {
+      "node_id": "specify",
+      "node_run_id": "pnr_ff000cdad8f2a05b9d264f132fb369bb1525cc07",
+      "attempt": 1,
+      "actor_class": "agent",
+      "outcome": "succeeded",
+      "started_at": "2026-10-24T18:13:34.741689Z",
+      "duration_ms": 22314,
+      "runner": {
+        "name": "claude-code",
+        "version": "2.1.309",
+        "model": "claude-sonnet-5-5",
+        "role_instructions_digest": "sha256:64a39d0f241ec1a34b4ae40f04fe3994151eb30327776b45fb48fd3453296006",
+        "turns": 7,
+        "input_tokens": 10,
+        "output_tokens": 2458,
+        "cost_micros_usd": 69092
+      },
+      "input_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/intent.md",
+          "digest": "sha256:4ac4d4ed42922274de40c70c2c95a6d34c72de66d19d3c88da0b71951b47b87e"
+        }
+      ],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/spec.md",
+          "digest": "sha256:b45be520c9d08f532b20e66e4a3de811e2655a60db28dd4ff60528782e44b47a",
+          "bytes": 3259
+        }
+      ]
+    },
+    {
+      "node_id": "classify",
+      "node_run_id": "pnr_c9e509ca71e85a44dba6e6f1ed6229ca0e156754",
+      "attempt": 1,
+      "actor_class": "worker",
+      "outcome": "passed",
+      "started_at": "2026-10-24T18:13:57.128499Z",
+      "duration_ms": 0,
+      "input_artifacts": [],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/classification.json",
+          "digest": "sha256:d5f0eeff97add8524d4726e7c1d81ac3ecdf5541eb0d1fb255dd7cef94c2e4d3",
+          "bytes": 597
+        }
+      ]
+    },
+    {
+      "node_id": "build",
+      "node_run_id": "pnr_925d419f47b98303c0a7fcf2f13f7aec48efa5d4",
+      "attempt": 1,
+      "actor_class": "agent",
+      "outcome": "succeeded",
+      "started_at": "2026-10-24T18:13:57.205274Z",
+      "duration_ms": 20029,
+      "runner": {
+        "name": "claude-code",
+        "version": "2.1.309",
+        "model": "claude-sonnet-5-5",
+        "role_instructions_digest": "sha256:f3f40ea1ea25519df4d89c7c8130b20b912a066ff4e864a9de210b8157c5e0f1",
+        "turns": 7,
+        "input_tokens": 10,
+        "output_tokens": 2257,
+        "cost_micros_usd": 69634
+      },
+      "input_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/intent.md",
+          "digest": "sha256:4ac4d4ed42922274de40c70c2c95a6d34c72de66d19d3c88da0b71951b47b87e"
+        },
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/spec.md",
+          "digest": "sha256:b45be520c9d08f532b20e66e4a3de811e2655a60db28dd4ff60528782e44b47a"
+        }
+      ],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/change-summary.md",
+          "digest": "sha256:af7406a2c9ec9855d8ae1070761bfde8d50bb3a03ab49135b5d6aec1d996700a",
+          "bytes": 1185
+        },
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/plan.md",
+          "digest": "sha256:8fbf66a5d4f5838ccad17cbd13742aae1d4b5ed5d02cd3816e438818db163325",
+          "bytes": 531
+        }
+      ]
+    },
+    {
+      "node_id": "verify",
+      "node_run_id": "pnr_45a32639e60c4d1ac64bf2d405295aedaf1afbf4",
+      "attempt": 1,
+      "actor_class": "worker",
+      "outcome": "passed",
+      "started_at": "2026-10-24T18:14:17.307328Z",
+      "duration_ms": 21076,
+      "input_artifacts": [],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verification-result.json",
+          "digest": "sha256:c3ba80b3392a26645770925f508e37a03cf74ad234d941a6d9bf4d82114dbfca",
+          "bytes": 1507
+        }
+      ]
+    },
+    {
+      "node_id": "review",
+      "node_run_id": "pnr_5b35432835e60bbedd7083caef8fe38db9617415",
+      "attempt": 1,
+      "actor_class": "agent",
+      "outcome": "succeeded",
+      "started_at": "2026-10-24T18:14:38.451867Z",
+      "duration_ms": 17839,
+      "runner": {
+        "name": "claude-code",
+        "version": "2.1.309",
+        "model": "claude-sonnet-5-5",
+        "role_instructions_digest": "sha256:5d2c67085e003c7bde865e1b81c4ef5110d6e64c3317960feb2f2271853842de",
+        "turns": 10,
+        "input_tokens": 8,
+        "output_tokens": 2324,
+        "cost_micros_usd": 61959
+      },
+      "input_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/intent.md",
+          "digest": "sha256:4ac4d4ed42922274de40c70c2c95a6d34c72de66d19d3c88da0b71951b47b87e"
+        },
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/spec.md",
+          "digest": "sha256:b45be520c9d08f532b20e66e4a3de811e2655a60db28dd4ff60528782e44b47a"
+        },
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/plan.md",
+          "digest": "sha256:8fbf66a5d4f5838ccad17cbd13742aae1d4b5ed5d02cd3816e438818db163325"
+        },
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/change-summary.md",
+          "digest": "sha256:af7406a2c9ec9855d8ae1070761bfde8d50bb3a03ab49135b5d6aec1d996700a"
+        },
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verification-result.json",
+          "digest": "sha256:c3ba80b3392a26645770925f508e37a03cf74ad234d941a6d9bf4d82114dbfca"
+        }
+      ],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/review-findings.json",
+          "digest": "sha256:bd8e4c56296ffd60524b4b333dce6b113ae9c45a5f4a2192a3859ea66e04730f",
+          "bytes": 2535
+        }
+      ]
+    },
+    {
+      "node_id": "review_gate",
+      "node_run_id": "pnr_0f48d8278b156d2fcd02ae116fce948534f4ef52",
+      "attempt": 1,
+      "actor_class": "worker",
+      "outcome": "passed",
+      "started_at": "2026-10-24T18:14:56.363219Z",
+      "duration_ms": 2,
+      "input_artifacts": [],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/review-record.json",
+          "digest": "sha256:8306fad4399f11d4e0cd57b0f46e4ae3743eeb52344e967bbcdbdbe42dc795e5",
+          "bytes": 5872
+        }
+      ]
+    },
+    {
+      "node_id": "reclassify_routine",
+      "node_run_id": "pnr_3c21b587f18a24bad6137c8856b836a3ae3dc201",
+      "attempt": 1,
+      "actor_class": "worker",
+      "outcome": "passed",
+      "started_at": "2026-10-24T18:14:56.42844Z",
+      "duration_ms": 4,
+      "input_artifacts": [],
+      "output_artifacts": [
+        {
+          "path": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/reclassification.json",
+          "digest": "sha256:a50bca608bec188753ef0add59e463106ea2a997c81082a5640892ef178a0254",
+          "bytes": 1090
+        }
+      ]
+    }
+  ],
+  "tier": {
+    "value": "routine",
+    "rules_digest": "sha256:b37013c03a9edf03ec0d3bbaf7884bb12d2ccf0ddbb7ac5629f686e9b74ed395",
+    "reason_codes": [
+      "prior_tier",
+      "proposed_tier"
+    ]
+  },
+  "totals": {
+    "cost_micros_usd": 200685,
+    "duration_ms": 82178,
+    "retries": 0,
+    "rework_traversals": 0
+  }
+}
