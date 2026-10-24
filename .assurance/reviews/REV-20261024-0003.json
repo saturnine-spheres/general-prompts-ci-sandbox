@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.1.0",
+  "record_id": "REV-20261024-0003",
+  "work_item": "docs/work-items/WI-0003-payment-fee.md",
+  "revision": "sha256:23f70601ddf205114f7671a38e72943179e6353ce673fd785b9f65054eb508a1",
+  "implementer": {
+    "identity": "agent:claude-code-builder",
+    "kind": "agent",
+    "context_id": "phase-c-session"
+  },
+  "reviewer": {
+    "identity": "agent:claude-code-reviewer",
+    "kind": "agent",
+    "context_id": "phase-c-review",
+    "authorized_role": "test reviewer",
+    "independent": false,
+    "independence_basis": "Same session as the builder; recorded as not independent for this gate test."
+  },
+  "scope": [
+    "diff"
+  ],
+  "evidence": [
+    {
+      "type": "verification-result",
+      "uri": ".assurance/evidence/verify.json",
+      "digest": "sha256:4e19eca69f9efcc7ea7f563bc3b0c94b5d2eb017090dfde36e89221682b2203e"
+    }
+  ],
+  "findings": [],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "verdict": "met",
+      "rationale": "TestFee asserts Fee(1000) is 10 and passes in verify.",
+      "evidence": [
+        {
+          "type": "verification-result",
+          "uri": ".assurance/evidence/verify.json",
+          "digest": "sha256:4e19eca69f9efcc7ea7f563bc3b0c94b5d2eb017090dfde36e89221682b2203e"
+        }
+      ]
+    }
+  ],
+  "decision": "approve",
+  "started_at": "2026-10-24T11:00:00Z",
+  "completed_at": "2026-10-24T11:05:00Z",
+  "signature": {
+    "state": "not_required",
+    "format": "none",
+    "signer": "agent:claude-code-reviewer",
+    "value_reference": "none"
+  }
+}
