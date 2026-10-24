@@ -1,0 +1,114 @@
+{
+  "schema_version": "1.1.0",
+  "record_id": "REV-WI0004-A7DB0513484B",
+  "work_item": "docs/work-items/WI-0004-praxis-verifier-entrypoints.md",
+  "revision": "sha256:1fadc447321a770a62a93e7ff3c31147fa0affb2e540fb9f1a6e9fdb56aab210",
+  "implementer": {
+    "identity": "agent:claude-code-terminal-session",
+    "kind": "agent",
+    "context_id": "praxis-ledger-session-2026-10-24"
+  },
+  "reviewer": {
+    "identity": "agent:claude-code-terminal-session",
+    "kind": "agent",
+    "context_id": "praxis-ledger-session-2026-10-24",
+    "authorized_role": "implementing agent self-check",
+    "independent": false,
+    "independence_basis": "Same agent and same context as the implementer; not independent. The owner's GitHub review is the independent review."
+  },
+  "scope": [
+    ".assurance/project-assurance-profile.json",
+    ".assurance/assurance-system-manifest.json",
+    "docs/work-items/WI-0004-praxis-verifier-entrypoints.md"
+  ],
+  "evidence": [
+    {
+      "type": "work_item",
+      "uri": "docs/work-items/WI-0004-praxis-verifier-entrypoints.md",
+      "digest": "sha256:45fec1d325a16fcf89d0f06bbec2d7ad2c74a4bc35998c27bbfff2c712a7b65c"
+    },
+    {
+      "type": "verification_result",
+      "uri": ".assurance/evidence/verify-fast.json",
+      "digest": "sha256:a36545782a5f21f4122d348a1d4fa2723ed0d5c46fed6bd360eb3241dd5df86d"
+    },
+    {
+      "type": "verification_result",
+      "uri": ".assurance/evidence/verify.json",
+      "digest": "sha256:b2d86b47df52a0db63b6e06c227ed22a0a5618e2bb9bfc4a65952715a98d46c8"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "info",
+      "status": "open",
+      "summary": "evidence_path stays flat; the open general-prompts 2.0.1 update moves records per branch, and Praxis follows that separately.",
+      "control_ids": []
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "verdict": "met",
+      "rationale": "Both entrypoints name the committed tier scripts through bash; the diff changes only those two values.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": ".assurance/project-assurance-profile.json",
+          "digest": "sha256:7fbd76fd25ee17df4040ab10b220a7bfa36d2faeac959da62190351968282f20"
+        }
+      ]
+    },
+    {
+      "id": "AC-2",
+      "verdict": "met",
+      "rationale": "verify-fast and verify passed on the branch commit in the Praxis verification image, not dirty, revision matching the commit.",
+      "evidence": [
+        {
+          "type": "verification_result",
+          "uri": ".assurance/evidence/verify-fast.json",
+          "digest": "sha256:a36545782a5f21f4122d348a1d4fa2723ed0d5c46fed6bd360eb3241dd5df86d"
+        },
+        {
+          "type": "verification_result",
+          "uri": ".assurance/evidence/verify.json",
+          "digest": "sha256:b2d86b47df52a0db63b6e06c227ed22a0a5618e2bb9bfc4a65952715a98d46c8"
+        }
+      ]
+    },
+    {
+      "id": "AC-3",
+      "verdict": "met",
+      "rationale": "run_budget is currency USD, amount 5, max_duration_minutes 60 unchanged.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": ".assurance/project-assurance-profile.json",
+          "digest": "sha256:7fbd76fd25ee17df4040ab10b220a7bfa36d2faeac959da62190351968282f20"
+        }
+      ]
+    },
+    {
+      "id": "AC-4",
+      "verdict": "met",
+      "rationale": "The manifest's installed_digest is the profile's normalized digest; validate_installed_assurance reports only the placeholder finding also present on main.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": ".assurance/assurance-system-manifest.json",
+          "digest": "sha256:b450c011fd31e11aa465247d2b7a1694ec4c453dbcea7cc7796466d9952dff44"
+        }
+      ]
+    }
+  ],
+  "decision": "approve",
+  "started_at": "2026-10-24T17:26:11Z",
+  "completed_at": "2026-10-24T17:26:11Z",
+  "signature": {
+    "state": "unverified",
+    "format": "none",
+    "signer": "agent:claude-code-terminal-session",
+    "value_reference": "unsigned; committed in a signed commit on profile/praxis-verifier-entrypoints"
+  }
+}

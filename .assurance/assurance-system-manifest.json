@@ -42,7 +42,7 @@
       "path": ".assurance/project-assurance-profile.json",
       "upstream_path": "project-assurance-profile.template.json",
       "upstream_digest": "sha256:fdb65fd99d90923306dca426db78daefe10d7224bbf47b45b6eb5cd553e4aeb8",
-      "installed_digest": "sha256:30e210ebd8b0c402c3d0b6353a7d4f910a89e3a1ccb2860965fb423d73d354b3",
+      "installed_digest": "sha256:7fbd76fd25ee17df4040ab10b220a7bfa36d2faeac959da62190351968282f20",
       "ownership": "project-owned",
       "local_changes": true
     },
