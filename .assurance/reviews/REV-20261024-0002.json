@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.1.0",
+  "record_id": "REV-20261024-0002",
+  "work_item": "docs/work-items/WI-0002-package-comment.md",
+  "revision": "sha256:737e5f590156b78450d92f28acde7015fca8fe324a197dee6f74196d12e2e36a",
+  "implementer": {
+    "identity": "agent:claude-code-builder",
+    "kind": "agent",
+    "context_id": "phase-c-session"
+  },
+  "reviewer": {
+    "identity": "agent:claude-code-reviewer",
+    "kind": "agent",
+    "context_id": "phase-c-review",
+    "authorized_role": "test reviewer",
+    "independent": false,
+    "independence_basis": "Same session as the builder; recorded as not independent for this gate test."
+  },
+  "scope": [
+    "diff"
+  ],
+  "evidence": [
+    {
+      "type": "verification-result",
+      "uri": ".assurance/evidence/verify.json",
+      "digest": "sha256:de0ccf8e926cae56b2598308f80817f824f298aea4fa833bff60eeae7b231e27"
+    }
+  ],
+  "findings": [],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "verdict": "met",
+      "rationale": "Checked against the diff and the passing verify tier.",
+      "evidence": [
+        {
+          "type": "verification-result",
+          "uri": ".assurance/evidence/verify.json",
+          "digest": "sha256:de0ccf8e926cae56b2598308f80817f824f298aea4fa833bff60eeae7b231e27"
+        }
+      ]
+    }
+  ],
+  "decision": "approve",
+  "started_at": "2026-10-24T11:00:00Z",
+  "completed_at": "2026-10-24T11:05:00Z",
+  "signature": {
+    "state": "not_required",
+    "format": "none",
+    "signer": "agent:claude-code-reviewer",
+    "value_reference": "none"
+  }
+}
