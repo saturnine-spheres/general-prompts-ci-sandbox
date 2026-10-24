@@ -23,6 +23,7 @@
     "status": {"enum": ["running", "awaiting_approval", "succeeded", "failed", "blocked", "cancelled"]},
     "started_at": {"type": "string", "format": "date-time"},
     "completed_at": {"type": ["string", "null"], "format": "date-time"},
+    "base_revision": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
     "stages": {
       "type": "array", "minItems": 1,
       "items": {

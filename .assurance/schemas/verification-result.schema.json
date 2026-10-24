@@ -54,6 +54,7 @@
           "attempts": {"type": "integer", "minimum": 1},
           "evidence": {"type": "array", "items": {"$ref": "#/definitions/attachment"}},
           "limitations": {"type": "array", "items": {"type": "string", "minLength": 1}},
+          "findings": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 500}},
           "vulnerability_data": {
             "type": "object", "additionalProperties": false,
             "required": ["source", "snapshot", "fetched_at", "maximum_age_seconds"],

@@ -162,7 +162,7 @@
     }
   ],
   "signing": {
-    "commits_required": true,
+    "commits_required": false,
     "artifacts_required": true,
     "allowed_formats": [
       "REPLACE signing format"
@@ -390,11 +390,11 @@
     "commit_message_style": "short plain imperative subject",
     "attribution": "forbidden",
     "push_policy": {
-      "agent_may_push": false,
+      "agent_may_push": true,
       "requires_passing_checks": true,
       "force_push": false,
       "protected_branches": [
-        "REPLACE default branch"
+        "main"
       ]
     }
   },

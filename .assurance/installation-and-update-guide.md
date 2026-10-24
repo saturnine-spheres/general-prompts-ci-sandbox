@@ -170,7 +170,7 @@ It writes a `gate-result` record and exits 0 only when it passes.
 
 ### Ratchet mode for legacy repositories
 
-`--mode ratchet` reads `.assurance/baseline/gate-baseline.json` at the target and the request head. A blocking-check finding (`check:<tier>:<check-id>`) that the target's baseline already lists is reported as `known` and does not fail; a new one fails. Process findings, such as a missing work item or review, are never baselined. The baseline may not gain entries unless a maintainer explicitly approves (`--baseline-growth-approved`, set by the wrappers from the `baseline-approved` label). While `report_only_until` is today or later, the gate reports findings without failing; after that date it enforces. Create the first baseline with the `baseline` command, review it, and record its approver.
+`--mode ratchet` reads `.assurance/baseline/gate-baseline.json` at the target and the request head. A blocking-check finding (`check:<tier>:<check-id>`, or `check:<tier>:<check-id>:<finding>` when the check lists individual findings, such as one line per unformatted file or untested package) that the target's baseline already lists is reported as `known` and does not fail; a new one fails. Process findings, such as a missing work item or review, are never baselined. The baseline may not gain entries unless a maintainer explicitly approves (`--baseline-growth-approved`, set by the wrappers from the `baseline-approved` label). While `report_only_until` is today or later, the gate reports findings without failing; after that date it enforces. Create the first baseline with the `baseline` command, review it, and record its approver.
 
 ### GitHub and GitLab wrappers
 
@@ -208,3 +208,4 @@ All 1.5.0 changes are additive for existing installations.
 - New `upstream-managed` tool `assurance_gate.py` (tier classifier and CI evidence gate with ratchet mode) and schemas `gate-result.schema.json` and `gate-baseline.schema.json`. An update adds them.
 - The `github` and `gitlab` adapters now install the CI wrappers; an update adds them to installations that recorded those adapters. The `claude-code` adapter still has no files.
 - Changing governance files (`.assurance/` outside evidence, `AGENTS.md`, and the gate's CI files) is classified significant, so it always needs a recorded human approval.
+- Verification-result checks accept an optional `findings` list; the verifier runner fills it from `fail_on_output` checks, one finding per output line, so ratchet mode can tell a known finding from a new one inside the same check. Evidence and verifier commands no longer make the next tier's revision dirty.

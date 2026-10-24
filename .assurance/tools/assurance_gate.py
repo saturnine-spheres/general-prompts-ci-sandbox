@@ -113,11 +113,17 @@ def is_test(path: str) -> bool:
 
 
 def classify(root: pathlib.Path, base: str, head: str, profile: dict[str, Any] | None) -> dict[str, Any]:
-    reasons: list[str] = []
     try:
         changes = [(path, lines) for path, lines in changed_files(root, base, head) if not path.startswith(EVIDENCE_PREFIXES)]
     except GateError as exc:
         return {"tier": "significant", "reasons": [f"classification failed: {exc}"], "changed_files": 0, "changed_lines": 0}
+    return classify_changes(changes, profile, lambda: files_at(root, head))
+
+
+def classify_changes(changes: list[tuple[str, int]], profile: dict[str, Any] | None, repository_files) -> dict[str, Any]:
+    """Tier for (path, changed lines) pairs; repository_files() lists files at head, for the touch-it-test-it rule.
+    Used for the actual diff in CI and for a planned change before a run builds anything."""
+    reasons: list[str] = []
     paths = [path for path, _lines in changes]
     total = sum(lines for _path, lines in changes)
     involvement = (profile or {}).get("human_involvement")
@@ -148,7 +154,7 @@ def classify(root: pathlib.Path, base: str, head: str, profile: dict[str, Any] |
         tier = rules["dependency_change_tier"]
         reasons.append("dependency manifests changed: " + ", ".join(dependencies))
     if rules.get("untested_touch_raises_tier") and tier != "significant":
-        tested_dirs = {path.rsplit("/", 1)[0] if "/" in path else "." for path in files_at(root, head) if is_test(path)}
+        tested_dirs = {path.rsplit("/", 1)[0] if "/" in path else "." for path in [*repository_files(), *paths] if is_test(path)}
         untested = sorted({path for path in paths if path.endswith(SOURCE_SUFFIXES) and not is_test(path)
                            and (path.rsplit("/", 1)[0] if "/" in path else ".") not in tested_dirs})
         if untested:
@@ -305,7 +311,11 @@ def evaluate(root: pathlib.Path, base: str, head: str, work_item_arg: str | None
                 if check["blocking"] and check["status"] != "pass":
                     if set(check["control_ids"]) <= waived_controls:
                         continue
-                    findings.add(f"check:{gate}:{check['id']}", f"blocking check {check['id']} is {check['status']} in {path}", ratchetable=True)
+                    if check.get("findings"):
+                        for item in check["findings"]:
+                            findings.add(f"check:{gate}:{check['id']}:{item}", f"blocking check {check['id']} reports {item} in {path}", ratchetable=True)
+                    else:
+                        findings.add(f"check:{gate}:{check['id']}", f"blocking check {check['id']} is {check['status']} in {path}", ratchetable=True)
             if any(item["required"] for item in value["unrun_checks"]):
                 findings.add(f"gate-unrun:{gate}", f"{path} lists required checks that did not run")
             # Rule 5: a sentinel that differs from its expected value fails, wherever it appears.

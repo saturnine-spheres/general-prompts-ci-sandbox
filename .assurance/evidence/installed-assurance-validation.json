@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-10-24T10:26:04.915642+00:00",
+  "validator": "tools/validate_installed_assurance.py",
+  "root": "C:\\Users\\ville\\AppData\\Local\\Temp\\claude\\C--Users-ville-saturnine-spheres-general-prompts\\a095f710-881f-469d-ba6f-c95cb3f958d4\\scratchpad\\sb\\repo",
+  "status": "fail",
+  "checks": [
+    {
+      "id": "installed-required-artifacts",
+      "passed": true,
+      "detail": "Required minimal-footprint artifacts are present."
+    },
+    {
+      "id": "installed-profile-schema",
+      "passed": true,
+      "detail": "C:\\Users\\ville\\AppData\\Local\\Temp\\claude\\C--Users-ville-saturnine-spheres-general-prompts\\a095f710-881f-469d-ba6f-c95cb3f958d4\\scratchpad\\sb\\repo\\.assurance\\project-assurance-profile.json conforms."
+    },
+    {
+      "id": "installed-catalog-schema",
+      "passed": true,
+      "detail": "C:\\Users\\ville\\AppData\\Local\\Temp\\claude\\C--Users-ville-saturnine-spheres-general-prompts\\a095f710-881f-469d-ba6f-c95cb3f958d4\\scratchpad\\sb\\repo\\.assurance\\control-catalog.yaml conforms."
+    },
+    {
+      "id": "installed-matrix-schema",
+      "passed": true,
+      "detail": "C:\\Users\\ville\\AppData\\Local\\Temp\\claude\\C--Users-ville-saturnine-spheres-general-prompts\\a095f710-881f-469d-ba6f-c95cb3f958d4\\scratchpad\\sb\\repo\\.assurance\\change-class-evidence-matrix.json conforms."
+    },
+    {
+      "id": "installed-manifest-schema",
+      "passed": true,
+      "detail": "C:\\Users\\ville\\AppData\\Local\\Temp\\claude\\C--Users-ville-saturnine-spheres-general-prompts\\a095f710-881f-469d-ba6f-c95cb3f958d4\\scratchpad\\sb\\repo\\.assurance\\assurance-system-manifest.json conforms."
+    },
+    {
+      "id": "installed-process-contract-schema",
+      "passed": true,
+      "detail": "C:\\Users\\ville\\AppData\\Local\\Temp\\claude\\C--Users-ville-saturnine-spheres-general-prompts\\a095f710-881f-469d-ba6f-c95cb3f958d4\\scratchpad\\sb\\repo\\.assurance\\process.json conforms."
+    },
+    {
+      "id": "installed-verifier-config-schema",
+      "passed": true,
+      "detail": "C:\\Users\\ville\\AppData\\Local\\Temp\\claude\\C--Users-ville-saturnine-spheres-general-prompts\\a095f710-881f-469d-ba6f-c95cb3f958d4\\scratchpad\\sb\\repo\\.assurance\\verifiers.json conforms."
+    },
+    {
+      "id": "installed-migration-records-schema",
+      "passed": true,
+      "detail": "3 migration record(s) conform."
+    },
+    {
+      "id": "installed-agent-pack-current",
+      "passed": true,
+      "detail": "Agent pack matches the installed profile, process contract, verifiers, and catalog."
+    },
+    {
+      "id": "installed-claude-imports-agents",
+      "passed": true,
+      "detail": "CLAUDE.md imports @AGENTS.md."
+    },
+    {
+      "id": "installed-agents-size",
+      "passed": true,
+      "detail": "8133 bytes with LF line endings; maximum 8192."
+    },
+    {
+      "id": "installed-control-ids",
+      "passed": true,
+      "detail": "62 controls; 62 unique IDs."
+    },
+    {
+      "id": "installed-active-placeholders-resolved",
+      "passed": false,
+      "detail": ".assurance/project-assurance-profile.json"
+    },
+    {
+      "id": "installed-manifest-lineage",
+      "passed": true,
+      "detail": "Managed paths are unique, contained, present, digest-matched, and consistently labelled."
+    }
+  ],
+  "failures": [
+    "installed-active-placeholders-resolved: .assurance/project-assurance-profile.json"
+  ],
+  "limitations": [
+    "This validates scaffold structure, selected JSON schemas, placeholders, IDs, and recorded file lineage; it does not approve product decisions or prove evidence truth.",
+    "Project-native verify tier implementation and stack-specific checks remain separate work after technology choices are accepted."
+  ]
+}

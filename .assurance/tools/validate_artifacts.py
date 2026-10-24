@@ -203,6 +203,8 @@ def verification_semantic(value: dict[str, Any]) -> bool:
     for check in value["checks"]:
         if "vulnerability_data" in check and check["tool"]["version"] == "unknown":
             return False
+        if check.get("findings") and check["status"] == "pass":
+            return False
     for sentinel in value.get("sentinels", []):
         if sentinel["outcome"] == "not_measured":
             if value["status"] == "pass":
@@ -323,6 +325,8 @@ def migration_record_semantic(value: dict[str, Any]) -> bool:
         if action["ownership"] == "project-owned" and kind not in {"KEEP", "SKIP", "SUGGEST", "ADD", "REMOVE"}:
             return False
         if kind == "REMOVE" and value["kind"] != "rollback":
+            return False
+        if action["ownership"] == "derived" and kind not in {"ADD", "REPLACE", "RESTORE", "REMOVE", "SKIP"}:
             return False
         if kind == "ADD" and action["before_digest"] is not None:
             return False
@@ -647,6 +651,40 @@ def main() -> int:
                 wrapper_problems.append(f"{name}: action not pinned to a full commit SHA: {used.group(1)}")
     add_check("ci-gate-wrappers", not wrapper_problems, "GitHub and GitLab wrappers call the forge-neutral gate with full history and pin every action to a commit SHA." if not wrapper_problems else "; ".join(wrapper_problems))
 
+    claude_problems: list[str] = []
+    adapter = root / "adapters/claude-code"
+    try:
+        settings = read_json(adapter / "settings.json")
+        handlers = [handler for groups in settings["hooks"].values() for group in groups for handler in group["hooks"]]
+        if set(settings["hooks"]) != {"PostToolUse", "PreToolUse", "Stop"}:
+            claude_problems.append("settings.json must configure PostToolUse, PreToolUse, and Stop hooks")
+        claude_problems += [f"hook does not call assurance-hook.sh: {handler.get('command')}" for handler in handlers
+                            if handler.get("type") != "command" or "${CLAUDE_PROJECT_DIR}/.claude/hooks/assurance-hook.sh" not in handler.get("command", "")]
+    except (OSError, ValueError, KeyError, TypeError) as exc:
+        claude_problems.append(f"settings.json: {exc}")
+
+    def front(path: pathlib.Path) -> str:
+        text = path.read_text(encoding="utf-8-sig") if path.exists() else ""
+        match = re.match(r"^---\r?\n(.*?)\r?\n---\r?\n", text, re.S)
+        return match.group(1) if match else ""
+
+    skill = front(adapter / "skills/deliver/SKILL.md")
+    claude_problems += [f"deliver skill frontmatter lacks {marker}" for marker in ("name: deliver", "description:", "disable-model-invocation: true") if marker not in skill]
+    for name in ("assurance-specifier", "assurance-builder", "assurance-reviewer"):
+        head = front(adapter / f"agents/{name}.md")
+        if f"name: {name}" not in head or "description:" not in head:
+            claude_problems.append(f"agents/{name}.md needs name: {name} and a description")
+    reviewer = front(adapter / "agents/assurance-reviewer.md")
+    tools_line = re.search(r"^tools:(.*)$", reviewer, re.M)
+    if not tools_line or re.search(r"\b(Edit|MultiEdit|NotebookEdit)\b", tools_line.group(1)) or "reviewer-write" not in reviewer:
+        claude_problems.append("reviewer must list tools without Edit and scope its writes with the reviewer-write hook")
+    claude_text = (adapter / "CLAUDE.md").read_text(encoding="utf-8-sig") if (adapter / "CLAUDE.md").exists() else ""
+    claude_problems += [f"CLAUDE.md lacks {marker}" for marker in ("@AGENTS.md", "@.assurance/agent-pack.md") if marker not in claude_text]
+    pack_text = (root / "tools/agent_pack.py").read_text(encoding="utf-8-sig") if (root / "tools/agent_pack.py").exists() else ""
+    if "LIMIT = 6144" not in pack_text:
+        claude_problems.append("agent_pack.py must enforce the 6 KiB pack limit")
+    add_check("claude-code-adapter", not claude_problems, "Claude Code adapter: hooks call the entrypoint, the deliver skill is user-invoked, the reviewer cannot edit code, CLAUDE.md imports AGENTS.md and the pack, and the pack is size-limited." if not claude_problems else "; ".join(claude_problems))
+
     version_path = root / "VERSION"
     package_version = version_path.read_text(encoding="utf-8").strip() if version_path.exists() else ""
     readme_text = (root / "README.md").read_text(encoding="utf-8-sig")
@@ -677,6 +715,10 @@ def main() -> int:
         "tools/verify-entrypoint.sh", "tools/verify-entrypoint.ps1", "tools/test_scaffold_project.py",
         "tools/assurance_gate.py", "tools/test_assurance_gate.py", "schemas/gate-result.schema.json", "schemas/gate-baseline.schema.json",
         "adapters/github/assurance-gate.yml", "adapters/gitlab/assurance-gate.gitlab-ci.yml", "adapters/gitlab/gitlab_mr.py",
+        "tools/delivery_run.py", "tools/agent_pack.py", "tools/test_claude_adapter.py",
+        "adapters/claude-code/CLAUDE.md", "adapters/claude-code/settings.json", "adapters/claude-code/hooks/assurance-hook.sh",
+        "adapters/claude-code/hooks/assurance_hooks.py", "adapters/claude-code/skills/deliver/SKILL.md",
+        "adapters/claude-code/agents/assurance-specifier.md", "adapters/claude-code/agents/assurance-builder.md", "adapters/claude-code/agents/assurance-reviewer.md",
     ]
     missing_required = [name for name in required_files if not (root / name).exists()]
     add_check("required-artifacts-present", not missing_required, "All required top-level artifacts are present." if not missing_required else ", ".join(missing_required))

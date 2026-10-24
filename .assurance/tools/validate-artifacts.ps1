@@ -98,6 +98,7 @@ function Test-VerificationSemantic {
     }
     foreach ($check in $Value.checks) {
         if (($check.PSObject.Properties.Name -contains 'vulnerability_data') -and $check.tool.version -eq 'unknown') { return $false }
+        if (@(Get-OptionalProperty $check 'findings' @()).Count -gt 0 -and $check.status -eq 'pass') { return $false }
     }
     foreach ($sentinel in @(Get-OptionalProperty $Value 'sentinels' @())) {
         if ($sentinel.outcome -eq 'not_measured') {
@@ -214,6 +215,7 @@ function Test-MigrationRecordSemantic {
         if ($applied -and $kind -eq 'CONFLICT') { return $false }
         if ($action.ownership -eq 'project-owned' -and $kind -notin @('KEEP', 'SKIP', 'SUGGEST', 'ADD', 'REMOVE')) { return $false }
         if ($kind -eq 'REMOVE' -and $Value.kind -ne 'rollback') { return $false }
+        if ($action.ownership -eq 'derived' -and $kind -notin @('ADD', 'REPLACE', 'RESTORE', 'REMOVE', 'SKIP')) { return $false }
         if ($kind -eq 'ADD' -and $null -ne $action.before_digest) { return $false }
         if ($applied -and $kind -in @('ADD', 'REPLACE', 'MERGE', 'RESTORE') -and $null -eq $action.after_digest) { return $false }
         if ($kind -in @('REPLACE', 'MERGE', 'RESTORE', 'REMOVE') -and $null -eq $action.before_digest) { return $false }
@@ -509,6 +511,43 @@ foreach ($entry in $wrapperMarkers.GetEnumerator()) {
 }
 Add-Check 'ci-gate-wrappers' ($wrapperProblems.Count -eq 0) $(if ($wrapperProblems.Count -eq 0) { 'GitHub and GitLab wrappers call the forge-neutral gate with full history and pin every action to a commit SHA.' } else { $wrapperProblems -join '; ' })
 
+$claudeProblems = [System.Collections.Generic.List[string]]::new()
+$adapterDir = Join-Path $rootPath 'adapters/claude-code'
+try {
+    $claudeSettings = Read-JsonObject (Join-Path $adapterDir 'settings.json')
+    $events = @($claudeSettings.hooks.PSObject.Properties.Name | Sort-Object)
+    if (($events -join ',') -ne 'PostToolUse,PreToolUse,Stop') { $claudeProblems.Add('settings.json must configure PostToolUse, PreToolUse, and Stop hooks') }
+    foreach ($eventEntry in $claudeSettings.hooks.PSObject.Properties) {
+        foreach ($group in $eventEntry.Value) {
+            foreach ($handler in $group.hooks) {
+                if ($handler.type -ne 'command' -or -not ([string]$handler.command).Contains('${CLAUDE_PROJECT_DIR}/.claude/hooks/assurance-hook.sh')) { $claudeProblems.Add("hook does not call assurance-hook.sh: $($handler.command)") }
+            }
+        }
+    }
+} catch { $claudeProblems.Add("settings.json: $($_.Exception.Message)") }
+function Get-Frontmatter {
+    param([string]$Path)
+    if (-not (Test-Path -LiteralPath $Path)) { return '' }
+    $match = [regex]::Match((Get-Content -Raw -LiteralPath $Path), '(?s)^---\r?\n(.*?)\r?\n---\r?\n')
+    if ($match.Success) { return $match.Groups[1].Value } else { return '' }
+}
+$skillFront = Get-Frontmatter (Join-Path $adapterDir 'skills/deliver/SKILL.md')
+foreach ($marker in @('name: deliver', 'description:', 'disable-model-invocation: true')) { if (-not $skillFront.Contains($marker)) { $claudeProblems.Add("deliver skill frontmatter lacks $marker") } }
+foreach ($agentName in @('assurance-specifier', 'assurance-builder', 'assurance-reviewer')) {
+    $agentFront = Get-Frontmatter (Join-Path $adapterDir "agents/$agentName.md")
+    if (-not $agentFront.Contains("name: $agentName") -or -not $agentFront.Contains('description:')) { $claudeProblems.Add("agents/$agentName.md needs name: $agentName and a description") }
+}
+$reviewerFront = Get-Frontmatter (Join-Path $adapterDir 'agents/assurance-reviewer.md')
+$toolsLine = [regex]::Match($reviewerFront, '(?m)^tools:(.*)$')
+if (-not $toolsLine.Success -or $toolsLine.Groups[1].Value -match '\b(Edit|MultiEdit|NotebookEdit)\b' -or -not $reviewerFront.Contains('reviewer-write')) { $claudeProblems.Add('reviewer must list tools without Edit and scope its writes with the reviewer-write hook') }
+$claudeMdPath = Join-Path $adapterDir 'CLAUDE.md'
+$claudeMd = if (Test-Path -LiteralPath $claudeMdPath) { Get-Content -Raw -LiteralPath $claudeMdPath } else { '' }
+foreach ($marker in @('@AGENTS.md', '@.assurance/agent-pack.md')) { if (-not $claudeMd.Contains($marker)) { $claudeProblems.Add("CLAUDE.md lacks $marker") } }
+$packToolPath = Join-Path $rootPath 'tools/agent_pack.py'
+$packTool = if (Test-Path -LiteralPath $packToolPath) { Get-Content -Raw -LiteralPath $packToolPath } else { '' }
+if (-not $packTool.Contains('LIMIT = 6144')) { $claudeProblems.Add('agent_pack.py must enforce the 6 KiB pack limit') }
+Add-Check 'claude-code-adapter' ($claudeProblems.Count -eq 0) $(if ($claudeProblems.Count -eq 0) { 'Claude Code adapter: hooks call the entrypoint, the deliver skill is user-invoked, the reviewer cannot edit code, CLAUDE.md imports AGENTS.md and the pack, and the pack is size-limited.' } else { $claudeProblems -join '; ' })
+
 $versionPath = Join-Path $rootPath 'VERSION'
 $packageVersion = if (Test-Path -LiteralPath $versionPath) { (Get-Content -Raw -LiteralPath $versionPath).Trim() } else { '' }
 $readmeText = Get-Content -Raw -LiteralPath (Join-Path $rootPath 'README.md')
@@ -538,7 +577,11 @@ $requiredFiles = @(
     'VERSION', 'schemas/verifier-config.schema.json', 'schemas/migration-record.schema.json', 'tools/run_verifier.py',
     'tools/verify-entrypoint.sh', 'tools/verify-entrypoint.ps1', 'tools/test_scaffold_project.py',
     'tools/assurance_gate.py', 'tools/test_assurance_gate.py', 'schemas/gate-result.schema.json', 'schemas/gate-baseline.schema.json',
-    'adapters/github/assurance-gate.yml', 'adapters/gitlab/assurance-gate.gitlab-ci.yml', 'adapters/gitlab/gitlab_mr.py'
+    'adapters/github/assurance-gate.yml', 'adapters/gitlab/assurance-gate.gitlab-ci.yml', 'adapters/gitlab/gitlab_mr.py',
+    'tools/delivery_run.py', 'tools/agent_pack.py', 'tools/test_claude_adapter.py',
+    'adapters/claude-code/CLAUDE.md', 'adapters/claude-code/settings.json', 'adapters/claude-code/hooks/assurance-hook.sh',
+    'adapters/claude-code/hooks/assurance_hooks.py', 'adapters/claude-code/skills/deliver/SKILL.md',
+    'adapters/claude-code/agents/assurance-specifier.md', 'adapters/claude-code/agents/assurance-builder.md', 'adapters/claude-code/agents/assurance-reviewer.md'
 )
 $missingRequired = @($requiredFiles | Where-Object { -not (Test-Path -LiteralPath (Join-Path $rootPath $_)) })
 Add-Check 'required-artifacts-present' ($missingRequired.Count -eq 0) $(if ($missingRequired.Count -eq 0) { 'All required top-level artifacts are present.' } else { $missingRequired -join ', ' })
