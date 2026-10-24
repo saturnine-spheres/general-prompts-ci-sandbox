@@ -1,0 +1,156 @@
+{
+  "schema_version": "1.1.0",
+  "record_id": "REV-49FCD89956F71CFA",
+  "work_item": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/spec.md",
+  "revision": "sha256:62faed84549389a41fe548c298343e43e7e36131275dff69b959a12e62e90e21",
+  "implementer": {
+    "identity": "v0-agent-worker",
+    "kind": "agent",
+    "context_id": "pnr_925d419f47b98303c0a7fcf2f13f7aec48efa5d4"
+  },
+  "reviewer": {
+    "identity": "v0-agent-worker",
+    "kind": "agent",
+    "context_id": "pnr_5b35432835e60bbedd7083caef8fe38db9617415",
+    "authorized_role": "reviewer",
+    "independent": false,
+    "independence_basis": "separate Praxis agent stage without the Builder's context or instructions; same agent principal, so not independent"
+  },
+  "scope": [
+    "git:66bf92ad73af195fdeecacbd4f3c55ba20ecbc76..1ed4fb652ce30ddab305ef50086940e846581d57"
+  ],
+  "evidence": [
+    {
+      "type": "review_findings",
+      "uri": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/review-findings.json",
+      "digest": "sha256:bd8e4c56296ffd60524b4b333dce6b113ae9c45a5f4a2192a3859ea66e04730f"
+    },
+    {
+      "type": "spec",
+      "uri": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/spec.md",
+      "digest": "sha256:b45be520c9d08f532b20e66e4a3de811e2655a60db28dd4ff60528782e44b47a"
+    },
+    {
+      "type": "verification-result",
+      "uri": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verification-result.json",
+      "digest": "sha256:c3ba80b3392a26645770925f508e37a03cf74ad234d941a6d9bf4d82114dbfca"
+    },
+    {
+      "type": "verification_result",
+      "uri": ".assurance/evidence/praxis-run-prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verify-fast.json",
+      "digest": "sha256:f596b0d2baaa50c6dc3ccdd2b5f77fe9e16e3ab37ae95c6c909ab8042beb8775"
+    },
+    {
+      "type": "verification_result",
+      "uri": ".assurance/evidence/praxis-run-prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verify.json",
+      "digest": "sha256:89aa257452e54875827372446931a41e4377831186d65cc0fc7238c85dd880f7"
+    }
+  ],
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "low",
+      "status": "open",
+      "summary": "Count keeps its own copy of the known-order data, so it can drift from Find. The cross-check test only covers IDs -5..100. The spec already identifies this as an accepted trade-off.",
+      "control_ids": []
+    },
+    {
+      "id": "F2",
+      "severity": "info",
+      "status": "open",
+      "summary": "change-summary.md says no checks were run, but verification-result.json shows both verify commands passed. The scripts' contents were not inspected, so I cannot confirm that they run go test on this package. The result is consistent with the change being sound.",
+      "control_ids": []
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "verdict": "met",
+      "rationale": "func Count() int is defined in orders.go.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": "src/orders/orders.go",
+          "digest": "sha256:95d7700d7dc8cef612e88994b753636e2003e6ae9c12c58695ac11f0ae1f671e"
+        }
+      ]
+    },
+    {
+      "id": "AC-2",
+      "verdict": "met",
+      "rationale": "Count returns len of a one-element slice, which is 1, and Find knows only ID 1.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": "src/orders/orders.go",
+          "digest": "sha256:95d7700d7dc8cef612e88994b753636e2003e6ae9c12c58695ac11f0ae1f671e"
+        }
+      ]
+    },
+    {
+      "id": "AC-3",
+      "verdict": "met",
+      "rationale": "TestCount asserts Count() == 1 and agreement with Exists. The verify commands exited 0.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": "src/orders/orders_test.go",
+          "digest": "sha256:3d1306f1fdeebec75e40eda0918963ff6ae14fedfb9039393c6ab95169e39c00"
+        },
+        {
+          "type": "file",
+          "uri": ".assurance/runs/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verification-result.json",
+          "digest": "sha256:c3ba80b3392a26645770925f508e37a03cf74ad234d941a6d9bf4d82114dbfca"
+        }
+      ]
+    },
+    {
+      "id": "AC-4",
+      "verdict": "met",
+      "rationale": "Find, Exists, TestFind and TestExists are textually unchanged. Only appended code is present, and verification passed.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": "src/orders/orders.go",
+          "digest": "sha256:95d7700d7dc8cef612e88994b753636e2003e6ae9c12c58695ac11f0ae1f671e"
+        },
+        {
+          "type": "file",
+          "uri": "src/orders/orders_test.go",
+          "digest": "sha256:3d1306f1fdeebec75e40eda0918963ff6ae14fedfb9039393c6ab95169e39c00"
+        }
+      ]
+    },
+    {
+      "id": "AC-5",
+      "verdict": "met",
+      "rationale": "The change touches the two Go files plus the process-required work item docs/work-items/WI-0006-order-count.md. I found no other changes.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": "docs/work-items/WI-0006-order-count.md",
+          "digest": "sha256:701f5473d6767d426cb4661a46c351b16ed4e3deb7d7f7b703cc52979a073136"
+        },
+        {
+          "type": "file",
+          "uri": "src/orders/orders.go",
+          "digest": "sha256:95d7700d7dc8cef612e88994b753636e2003e6ae9c12c58695ac11f0ae1f671e"
+        },
+        {
+          "type": "file",
+          "uri": "src/orders/orders_test.go",
+          "digest": "sha256:3d1306f1fdeebec75e40eda0918963ff6ae14fedfb9039393c6ab95169e39c00"
+        }
+      ]
+    }
+  ],
+  "decision": "approve",
+  "started_at": "2026-10-24T18:14:38Z",
+  "completed_at": "2026-10-24T18:14:56Z",
+  "signature": {
+    "state": "unverified",
+    "format": "none",
+    "signer": "v0-agent-worker",
+    "value_reference": "unsigned; committed on the Praxis run branch praxis/run/prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5"
+  }
+}
