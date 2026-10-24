@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.1.0",
+  "record_id": "REV-20261024-0001",
+  "work_item": "docs/work-items/WI-0001-order-exists.md",
+  "revision": "sha256:e0fb0756dabc958ec93ad58c18119e1f1e3a731fac214adad1be4cf9ea042a7d",
+  "implementer": {
+    "identity": "agent:claude-code-builder",
+    "kind": "agent",
+    "context_id": "phase-c-session"
+  },
+  "reviewer": {
+    "identity": "agent:claude-code-reviewer",
+    "kind": "agent",
+    "context_id": "phase-c-review",
+    "authorized_role": "test reviewer",
+    "independent": false,
+    "independence_basis": "Same session as the builder; recorded as not independent for this gate test."
+  },
+  "scope": [
+    "src/orders",
+    "docs/work-items/WI-0001-order-exists.md"
+  ],
+  "evidence": [
+    {
+      "type": "verification-result",
+      "uri": ".assurance/evidence/verify.json",
+      "digest": "sha256:ce4043b48e053ff0045c62c969a632124c65dd4375a9eea999125f20cf397052"
+    }
+  ],
+  "findings": [],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "verdict": "met",
+      "rationale": "TestExists asserts Exists(1) is true and passes in verify.",
+      "evidence": [
+        {
+          "type": "verification-result",
+          "uri": ".assurance/evidence/verify.json",
+          "digest": "sha256:ce4043b48e053ff0045c62c969a632124c65dd4375a9eea999125f20cf397052"
+        }
+      ]
+    },
+    {
+      "id": "AC-2",
+      "verdict": "met",
+      "rationale": "TestExists asserts Exists(2) is false and passes in verify.",
+      "evidence": [
+        {
+          "type": "verification-result",
+          "uri": ".assurance/evidence/verify.json",
+          "digest": "sha256:ce4043b48e053ff0045c62c969a632124c65dd4375a9eea999125f20cf397052"
+        }
+      ]
+    }
+  ],
+  "decision": "approve",
+  "started_at": "2026-10-24T10:00:00Z",
+  "completed_at": "2026-10-24T10:05:00Z",
+  "signature": {
+    "state": "not_required",
+    "format": "none",
+    "signer": "agent:claude-code-reviewer",
+    "value_reference": "none"
+  }
+}
