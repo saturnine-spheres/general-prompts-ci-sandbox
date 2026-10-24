@@ -85,6 +85,18 @@ def main() -> int:
     if migration_records:
         add("installed-migration-records-schema", not bad_records, f"{len(migration_records)} migration record(s) conform." if not bad_records else ", ".join(bad_records))
 
+    pack = assurance / "agent-pack.md"
+    if pack.is_file():
+        from agent_pack import render
+        current = normalized_bytes(pack.read_bytes()).decode("utf-8", errors="replace")
+        add("installed-agent-pack-current", current == render(root), "Agent pack matches the installed profile, process contract, verifiers, and catalog."
+            if current == render(root) else "Agent pack is stale; run .assurance/tools/agent_pack.py.")
+    claude = root / "CLAUDE.md"
+    if claude.is_file() and (root / "AGENTS.md").is_file():
+        imports = "@AGENTS.md" in claude.read_text(encoding="utf-8-sig")
+        add("installed-claude-imports-agents", imports, "CLAUDE.md imports @AGENTS.md." if imports
+            else "CLAUDE.md exists but does not import @AGENTS.md, so Claude Code would not read the repository's operating instructions.")
+
     agents = root / "AGENTS.md"
     agents_bytes = len(normalized_bytes(agents.read_bytes())) if agents.is_file() else 0
     add("installed-agents-size", 0 < agents_bytes <= 8192, f"{agents_bytes} bytes with LF line endings; maximum 8192.")

@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/migration-record.schema.json",
+  "title": "Installation, update, or rollback migration record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "migration_id", "kind", "from_version", "to_version", "created_at", "applied_at", "owner", "package", "snapshot_dir", "status", "rolls_back", "actions"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "migration_id": {"type": "string", "pattern": "^MIG-[0-9]{8}T[0-9]{6}Z-[a-f0-9]{8}$"},
+    "kind": {"enum": ["install", "update", "rollback"]},
+    "from_version": {"type": ["string", "null"], "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "to_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "applied_at": {"type": ["string", "null"], "format": "date-time"},
+    "owner": {"type": "string", "minLength": 1},
+    "package": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "distribution_digest"],
+      "properties": {
+        "source": {"type": "string", "minLength": 1},
+        "distribution_digest": {"$ref": "#/definitions/sha256"}
+      }
+    },
+    "snapshot_dir": {"type": ["string", "null"], "pattern": "^\\.assurance/backups/[A-Za-z0-9._-]+$"},
+    "status": {"enum": ["planned", "applied", "rolled_back", "failed"]},
+    "rolls_back": {"type": ["string", "null"], "pattern": "^MIG-[0-9]{8}T[0-9]{6}Z-[a-f0-9]{8}$"},
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "ownership", "action", "before_digest", "after_digest", "upstream_digest"],
+        "properties": {
+          "path": {"type": "string", "pattern": "^(?![A-Za-z]:|/|.*(?:^|/)\\.\\.(?:/|$)).+$"},
+          "ownership": {"enum": ["upstream-managed", "merge-managed", "project-owned"]},
+          "action": {"enum": ["ADD", "REPLACE", "MERGE", "KEEP", "SKIP", "SUGGEST", "CONFLICT", "RESTORE", "REMOVE"]},
+          "before_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+          "after_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
+          "upstream_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

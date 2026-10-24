@@ -1,0 +1,439 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/project-assurance-profile.schema.json",
+  "title": "Project assurance profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "profile_version", "project", "human_accountability", "authority", "risk", "change_classes", "stack", "platforms", "verification_tiers", "tools", "signing", "external_effects", "release", "architecture_assurance", "security_assurance", "control_effectiveness", "corporate_agent", "data_governance", "operations", "exceptions"],
+  "properties": {
+    "schema_version": {"enum": ["1.1.0", "1.2.0"]},
+    "profile_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "project": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "repository", "description"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "repository": {"type": "string", "minLength": 1},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "human_accountability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["system_owner", "security_owner", "privacy_owner", "release_approver", "risk_acceptance_authority"],
+      "properties": {
+        "system_owner": {"type": "string", "minLength": 1},
+        "security_owner": {"type": "string", "minLength": 1},
+        "privacy_owner": {"type": "string", "minLength": 1},
+        "release_approver": {"type": "string", "minLength": 1},
+        "risk_acceptance_authority": {"type": "string", "minLength": 1}
+      }
+    },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ordered_sources", "conflict_rule", "approval_matrix"],
+      "properties": {
+        "ordered_sources": {"type": "array", "minItems": 5, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "conflict_rule": {"const": "stop_and_escalate"},
+        "approval_matrix": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["action", "minimum_risk", "approver_roles", "separation_required"],
+            "properties": {
+              "action": {"type": "string", "minLength": 1},
+              "minimum_risk": {"$ref": "#/definitions/risk_class"},
+              "approver_roles": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+              "separation_required": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    },
+    "risk": {
+      "type": "object", "additionalProperties": false,
+      "required": ["class", "critical_paths", "material_change_triggers", "high_impact_decisions"],
+      "properties": {
+        "class": {"$ref": "#/definitions/risk_class"},
+        "critical_paths": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "material_change_triggers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/definitions/material_trigger"}},
+        "high_impact_decisions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "change_classes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/definitions/change_class"}},
+    "stack": {
+      "type": "object", "additionalProperties": false,
+      "required": ["languages", "datastores", "ci_systems", "deployment_targets"],
+      "properties": {
+        "languages": {"$ref": "#/definitions/string_array"},
+        "datastores": {"$ref": "#/definitions/string_array"},
+        "ci_systems": {"$ref": "#/definitions/string_array"},
+        "deployment_targets": {"$ref": "#/definitions/string_array"}
+      }
+    },
+    "platforms": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["name", "versions", "support_end", "owner"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "versions": {"$ref": "#/definitions/string_array"},
+          "support_end": {"type": ["string", "null"], "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+          "owner": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "verification_tiers": {
+      "type": "object", "additionalProperties": false,
+      "required": ["verify-fast", "verify", "verify-live", "verify-release"],
+      "properties": {
+        "verify-fast": {"$ref": "#/definitions/tier"},
+        "verify": {"$ref": "#/definitions/tier"},
+        "verify-live": {"$ref": "#/definitions/tier"},
+        "verify-release": {"$ref": "#/definitions/tier"}
+      }
+    },
+    "tools": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "category", "version", "digest", "owner", "approved_uses", "maintenance_review", "noise_budget", "license"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$"},
+          "category": {"type": "string", "minLength": 1},
+          "version": {"type": "string", "minLength": 1},
+          "digest": {"$ref": "#/definitions/digest_or_na"},
+          "owner": {"type": "string", "minLength": 1},
+          "approved_uses": {"$ref": "#/definitions/string_array"},
+          "maintenance_review": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+          "noise_budget": {"type": "string", "minLength": 1},
+          "license": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "signing": {
+      "type": "object", "additionalProperties": false,
+      "required": ["commits_required", "artifacts_required", "allowed_formats", "key_custody"],
+      "properties": {
+        "commits_required": {"type": "boolean"},
+        "artifacts_required": {"type": "boolean"},
+        "allowed_formats": {"$ref": "#/definitions/string_array"},
+        "key_custody": {"type": "string", "minLength": 1}
+      }
+    },
+    "external_effects": {
+      "type": "object", "additionalProperties": false,
+      "required": ["default", "allowed_types", "egress_allowlist", "max_cost", "max_egress_bytes", "max_requests", "confirmation_required", "ledger_required"],
+      "properties": {
+        "default": {"enum": ["deny", "allow_declared"]},
+        "allowed_types": {"$ref": "#/definitions/string_array"},
+        "egress_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+        "max_cost": {"type": "object", "additionalProperties": false, "required": ["currency", "amount"], "properties": {"currency": {"type": "string", "pattern": "^[A-Z]{3}$"}, "amount": {"type": "number", "minimum": 0}}},
+        "max_egress_bytes": {"type": "integer", "minimum": 0},
+        "max_requests": {"type": "integer", "minimum": 0},
+        "confirmation_required": {"type": "boolean"},
+        "ledger_required": {"type": "boolean"}
+      }
+    },
+    "release": {
+      "type": "object", "additionalProperties": false,
+      "required": ["independent_review", "sbom_format", "provenance_format", "rollback_test", "backup_restore_test", "disaster_recovery_test", "progressive_delivery"],
+      "properties": {
+        "independent_review": {"type": "boolean"},
+        "sbom_format": {"type": "string", "minLength": 1},
+        "provenance_format": {"type": "string", "minLength": 1},
+        "rollback_test": {"type": "boolean"},
+        "backup_restore_test": {"type": "boolean"},
+        "disaster_recovery_test": {"type": "boolean"},
+        "progressive_delivery": {
+          "type": "object", "additionalProperties": false,
+          "required": ["required", "stages", "promotion_criteria", "automatic_halt", "rollback", "safe_disable", "blast_radius_limit", "owner"],
+          "properties": {
+            "required": {"type": "boolean"},
+            "stages": {"$ref": "#/definitions/string_array"},
+            "promotion_criteria": {"type": "string", "minLength": 1},
+            "automatic_halt": {"type": "string", "minLength": 1},
+            "rollback": {"type": "string", "minLength": 1},
+            "safe_disable": {"type": "string", "minLength": 1},
+            "blast_radius_limit": {"type": "string", "minLength": 1},
+            "owner": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "architecture_assurance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["record_path", "diagram_format", "required_views", "flowchart_triggers", "threat_model_method", "review_owner", "max_review_age_days"],
+      "properties": {
+        "record_path": {"type": "string", "minLength": 1},
+        "diagram_format": {"enum": ["mermaid", "plantuml", "structurizr", "approved-diagram-as-code"]},
+        "required_views": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["system_context", "container_component", "deployment", "data_flow_trust_boundaries"]}},
+        "flowchart_triggers": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["authorization_or_approval", "multi_stage_transaction", "state_machine", "retry_timeout_recovery", "rollback_or_safe_disable", "external_effect", "system_of_record_or_reconciliation", "incident_or_continuity"]}},
+        "threat_model_method": {"type": "string", "minLength": 1},
+        "review_owner": {"type": "string", "minLength": 1},
+        "max_review_age_days": {"type": "integer", "minimum": 1}
+      }
+    },
+    "security_assurance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["adversarial_methods", "selection_rules", "penetration_testing", "vulnerability_disclosure", "psirt_owner", "privileged_access"],
+      "properties": {
+        "adversarial_methods": {"$ref": "#/definitions/string_array"},
+        "selection_rules": {"type": "string", "minLength": 1},
+        "penetration_testing": {
+          "type": "object", "additionalProperties": false,
+          "required": ["enabled", "cadence_days", "trigger", "owner"],
+          "properties": {
+            "enabled": {"type": "boolean"},
+            "cadence_days": {"type": ["integer", "null"], "minimum": 1},
+            "trigger": {"type": "string", "minLength": 1},
+            "owner": {"type": "string", "minLength": 1}
+          }
+        },
+        "vulnerability_disclosure": {"type": "string", "minLength": 1},
+        "psirt_owner": {"type": "string", "minLength": 1},
+        "privileged_access": {
+          "type": "object", "additionalProperties": false,
+          "required": ["production_access", "recertification_days", "break_glass", "session_audit", "environment_separation", "owner"],
+          "properties": {
+            "production_access": {"enum": ["none", "jit_only", "standing_exception"]},
+            "recertification_days": {"type": "integer", "minimum": 1},
+            "break_glass": {"type": "string", "minLength": 1},
+            "session_audit": {"type": "boolean"},
+            "environment_separation": {"type": "string", "minLength": 1},
+            "owner": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "control_effectiveness": {
+      "type": "object", "additionalProperties": false,
+      "required": ["assessment_cadence_days", "max_evidence_age_days", "sampling_rule", "independent_assessment", "failure_action", "owner"],
+      "properties": {
+        "assessment_cadence_days": {"type": "integer", "minimum": 1},
+        "max_evidence_age_days": {"type": "integer", "minimum": 1},
+        "sampling_rule": {"type": "string", "minLength": 1},
+        "independent_assessment": {"type": "string", "minLength": 1},
+        "failure_action": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1}
+      }
+    },
+    "corporate_agent": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enabled", "human_owner", "high_impact_human_review", "workload_identity", "environment_separation", "delegation_may_expand_authority", "untrusted_content_policy", "kill_switch", "registries", "evaluation", "fallback_policy"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "human_owner": {"type": "string", "minLength": 1},
+        "high_impact_human_review": {"type": "boolean"},
+        "workload_identity": {"type": "string", "minLength": 1},
+        "environment_separation": {"type": "string", "minLength": 1},
+        "delegation_may_expand_authority": {"const": false},
+        "untrusted_content_policy": {"const": "data_not_instructions"},
+        "kill_switch": {"type": "string", "minLength": 1},
+        "registries": {
+          "type": "object", "additionalProperties": false,
+          "required": ["models", "prompts", "tools", "plugins_mcp", "datasets", "providers"],
+          "properties": {
+            "models": {"$ref": "#/definitions/registry_array"},
+            "prompts": {"$ref": "#/definitions/registry_array"},
+            "tools": {"$ref": "#/definitions/registry_array"},
+            "plugins_mcp": {"$ref": "#/definitions/registry_array"},
+            "datasets": {"$ref": "#/definitions/registry_array"},
+            "providers": {"$ref": "#/definitions/registry_array"}
+          }
+        },
+        "evaluation": {
+          "type": "object", "additionalProperties": false,
+          "required": ["held_out", "adversarial", "prompt_injection", "repeated_runs", "bias_fairness_trigger", "drift_threshold", "evidence_ceiling"],
+          "properties": {
+            "held_out": {"type": "boolean"}, "adversarial": {"type": "boolean"}, "prompt_injection": {"type": "boolean"},
+            "repeated_runs": {"type": "integer", "minimum": 1},
+            "bias_fairness_trigger": {"type": "string", "minLength": 1},
+            "drift_threshold": {"type": "string", "minLength": 1},
+            "evidence_ceiling": {"type": "string", "minLength": 1}
+          }
+        },
+        "fallback_policy": {"type": "string", "minLength": 1}
+      }
+    },
+    "data_governance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["classifications", "default_classification", "residency", "retention", "provider_disclosures", "training_use", "secret_custody", "test_data_policy"],
+      "properties": {
+        "classifications": {"$ref": "#/definitions/string_array"},
+        "default_classification": {"type": "string", "minLength": 1},
+        "residency": {"$ref": "#/definitions/string_array"},
+        "retention": {"type": "string", "minLength": 1},
+        "provider_disclosures": {"type": "string", "minLength": 1},
+        "training_use": {"type": "string", "minLength": 1},
+        "secret_custody": {"type": "string", "minLength": 1},
+        "test_data_policy": {"type": "string", "minLength": 1}
+      }
+    },
+    "operations": {
+      "type": "object", "additionalProperties": false,
+      "required": ["performance_budgets", "observability", "backup", "disaster_recovery", "deprecation_notice_days", "incident_plan", "cancellation_timeout_policy", "service_level_objectives", "error_budget_policy", "post_incident_learning", "third_party_resilience"],
+      "properties": {
+        "performance_budgets": {"type": "string", "minLength": 1},
+        "observability": {"type": "string", "minLength": 1},
+        "backup": {"type": "string", "minLength": 1},
+        "disaster_recovery": {"type": "string", "minLength": 1},
+        "deprecation_notice_days": {"type": "integer", "minimum": 0},
+        "incident_plan": {"type": "string", "minLength": 1},
+        "cancellation_timeout_policy": {"type": "string", "minLength": 1},
+        "service_level_objectives": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["name", "indicator", "target", "window", "owner"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "indicator": {"type": "string", "minLength": 1},
+              "target": {"type": "string", "minLength": 1},
+              "window": {"type": "string", "minLength": 1},
+              "owner": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "error_budget_policy": {"type": "string", "minLength": 1},
+        "post_incident_learning": {"type": "string", "minLength": 1},
+        "third_party_resilience": {"type": "string", "minLength": 1}
+      }
+    },
+    "exceptions": {
+      "type": "object", "additionalProperties": false,
+      "required": ["waiver_schema", "maximum_days", "prohibited_control_ids"],
+      "properties": {
+        "waiver_schema": {"type": "string", "minLength": 1},
+        "maximum_days": {"type": "integer", "minimum": 1},
+        "prohibited_control_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$"}}
+      }
+    },
+    "human_involvement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tier_rules", "roles", "timers"],
+      "properties": {
+        "tier_rules": {
+          "type": "object", "additionalProperties": false,
+          "required": ["routine_path_allowlist", "protected_paths", "routine_max_changed_lines", "routine_max_changed_files", "notable_max_changed_lines", "dependency_change_tier", "run_budget", "unclassified_tier"],
+          "properties": {
+            "routine_path_allowlist": {"$ref": "#/definitions/string_array"},
+            "protected_paths": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+            "routine_max_changed_lines": {"type": "integer", "minimum": 0},
+            "routine_max_changed_files": {"type": "integer", "minimum": 0},
+            "notable_max_changed_lines": {"type": "integer", "minimum": 0},
+            "dependency_change_tier": {"enum": ["notable", "significant"]},
+            "run_budget": {
+              "type": "object", "additionalProperties": false,
+              "required": ["currency", "amount", "max_duration_minutes"],
+              "properties": {
+                "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+                "amount": {"type": "number", "minimum": 0},
+                "max_duration_minutes": {"type": "integer", "minimum": 1}
+              }
+            },
+            "unclassified_tier": {"const": "significant"},
+            "untested_touch_raises_tier": {"type": "boolean"}
+          }
+        },
+        "roles": {
+          "type": "object", "additionalProperties": false,
+          "required": ["routine", "notable", "significant"],
+          "properties": {
+            "routine": {"$ref": "#/definitions/tier_roles"},
+            "notable": {"$ref": "#/definitions/tier_roles"},
+            "significant": {"$ref": "#/definitions/tier_roles"}
+          }
+        },
+        "timers": {
+          "type": "object", "additionalProperties": false,
+          "required": ["reminder_hours", "escalation_hours", "expiry_hours"],
+          "properties": {
+            "reminder_hours": {"type": "integer", "minimum": 1},
+            "escalation_hours": {"type": "integer", "minimum": 1},
+            "expiry_hours": {"type": "integer", "minimum": 1}
+          }
+        }
+      }
+    },
+    "delivery": {
+      "type": "object", "additionalProperties": false,
+      "required": ["commit_message_style", "attribution", "push_policy"],
+      "properties": {
+        "commit_message_style": {"type": "string", "minLength": 1},
+        "attribution": {"enum": ["forbidden", "allowed", "required"]},
+        "push_policy": {
+          "type": "object", "additionalProperties": false,
+          "required": ["agent_may_push", "requires_passing_checks", "force_push"],
+          "properties": {
+            "agent_may_push": {"type": "boolean"},
+            "requires_passing_checks": {"type": "boolean"},
+            "force_push": {"const": false},
+            "protected_branches": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+          }
+        }
+      }
+    },
+    "process_light_mode": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enabled", "applies_to", "light_process", "reentry_triggers"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "applies_to": {"type": "string", "minLength": 1},
+        "light_process": {"type": "string", "minLength": 1},
+        "reentry_triggers": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "condition"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
+              "condition": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "risk_class": {"enum": ["low", "moderate", "high", "critical"]},
+    "change_class": {"enum": ["docs", "architecture_design", "domain_code", "api_schema", "migrations_data", "auth_security", "dependencies_tooling", "ui_accessibility", "performance", "ai_model_behavior", "infrastructure", "release"]},
+    "material_trigger": {"enum": ["external_contract", "security_privacy_boundary", "production_dependency", "toolchain", "ci_enforcement", "external_service", "model_provider", "plugin_mcp", "dataset", "data_governance", "supported_platform", "migration", "release_signing", "cost_model", "high_impact_decision", "risk_control", "architecture_boundary", "service_level_objective", "privileged_access", "progressive_delivery"]},
+    "string_array": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "digest_or_na": {"type": "string", "pattern": "^(sha256:[a-f0-9]{64}|not-applicable:[a-z0-9._-]+)$"},
+    "tier": {
+      "type": "object", "additionalProperties": false,
+      "required": ["entrypoint", "timeout_seconds", "network", "evidence_path"],
+      "properties": {
+        "entrypoint": {"type": "string", "minLength": 1},
+        "timeout_seconds": {"type": "integer", "minimum": 1},
+        "network": {"enum": ["denied", "allowlisted"]},
+        "evidence_path": {"type": "string", "minLength": 1}
+      }
+    },
+    "tier_roles": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reviewers", "stakeholders"],
+      "properties": {
+        "reviewers": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "stakeholders": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "registry_array": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "version", "digest", "owner", "approved_use", "evaluation_evidence", "rollback"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "version": {"type": "string", "minLength": 1},
+          "digest": {"$ref": "#/definitions/digest_or_na"},
+          "owner": {"type": "string", "minLength": 1},
+          "approved_use": {"type": "string", "minLength": 1},
+          "evaluation_evidence": {"type": "string", "minLength": 1},
+          "rollback": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  }
+}

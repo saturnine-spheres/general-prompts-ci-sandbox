@@ -23,6 +23,7 @@
     "status": {"enum": ["running", "awaiting_approval", "succeeded", "failed", "blocked", "cancelled"]},
     "started_at": {"type": "string", "format": "date-time"},
     "completed_at": {"type": ["string", "null"], "format": "date-time"},
+    "base_revision": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
     "stages": {
       "type": "array", "minItems": 1,
       "items": {
@@ -74,6 +75,34 @@
           "decision": {"enum": ["approve", "reject"]},
           "decided_at": {"type": "string", "format": "date-time"},
           "reference": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "classification", "summary", "location", "evidence", "severity", "security", "found_by", "action", "ticket"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^F-[0-9]+$"},
+          "classification": {"enum": ["introduced", "in_scope_preexisting", "blocking_out_of_scope", "unrelated", "uncertain"]},
+          "summary": {"type": "string", "minLength": 1},
+          "location": {
+            "type": "object", "additionalProperties": false,
+            "required": ["path", "start_line", "end_line", "commit"],
+            "properties": {
+              "path": {"type": "string", "minLength": 1},
+              "start_line": {"type": "integer", "minimum": 1},
+              "end_line": {"type": "integer", "minimum": 1},
+              "commit": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"}
+            }
+          },
+          "evidence": {"type": "string", "minLength": 1},
+          "severity": {"enum": ["low", "medium", "high", "critical"]},
+          "security": {"type": "boolean"},
+          "found_by": {"enum": ["builder", "reviewer", "gate"]},
+          "action": {"enum": ["fixed", "fixed_in_scope", "ticket_filed", "commented_existing", "observation", "private_advisory", "withheld", "blocked"]},
+          "ticket": {"type": ["string", "null"], "minLength": 1}
         }
       }
     },

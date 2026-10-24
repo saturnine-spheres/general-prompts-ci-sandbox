@@ -98,6 +98,7 @@ function Test-VerificationSemantic {
     }
     foreach ($check in $Value.checks) {
         if (($check.PSObject.Properties.Name -contains 'vulnerability_data') -and $check.tool.version -eq 'unknown') { return $false }
+        if (@(Get-OptionalProperty $check 'findings' @()).Count -gt 0 -and $check.status -eq 'pass') { return $false }
     }
     foreach ($sentinel in @(Get-OptionalProperty $Value 'sentinels' @())) {
         if ($sentinel.outcome -eq 'not_measured') {
@@ -129,6 +130,43 @@ function Test-RunManifestSemantic {
         if (@($approvals | Where-Object { $_.decision -eq 'reject' }).Count -gt 0) { return $false }
         if ($Value.approved_tier -eq 'significant' -and @($approvals | Where-Object { $_.decision -eq 'approve' -and $_.tier -eq 'significant' }).Count -eq 0) { return $false }
     }
+    return (Test-FindingsSemantic @(Get-OptionalProperty $Value 'findings' @()))
+}
+
+$script:TicketActions = @('ticket_filed', 'commented_existing', 'private_advisory')
+$script:FindingActions = @{
+    introduced = @('fixed', 'blocked')
+    in_scope_preexisting = @('fixed_in_scope')
+    blocking_out_of_scope = @('ticket_filed', 'commented_existing', 'private_advisory', 'withheld', 'blocked')
+    unrelated = @('ticket_filed', 'commented_existing', 'private_advisory', 'withheld', 'observation')
+    uncertain = @('observation')
+}
+
+function Test-FindingsSemantic {
+    param($Findings)
+    if (-not (Test-UniqueOrdinal @($Findings | ForEach-Object { $_.id }))) { return $false }
+    foreach ($item in $Findings) {
+        if ($item.location.start_line -gt $item.location.end_line) { return $false }
+        if ($script:FindingActions[$item.classification] -cnotcontains $item.action) { return $false }
+        if ($item.security -and $item.action -in @('ticket_filed', 'commented_existing')) { return $false }
+        if (($null -ne $item.ticket) -ne ($script:TicketActions -ccontains $item.action)) { return $false }
+    }
+    return $true
+}
+
+function Test-TriageReportSemantic {
+    param($Value)
+    $ranks = [int[]]@($Value.tickets | ForEach-Object { $_.rank })
+    [Array]::Sort($ranks)
+    for ($i = 0; $i -lt $ranks.Count; $i++) { if ($ranks[$i] -ne $i + 1) { return $false } }
+    foreach ($item in $Value.tickets) {
+        $criteria = $item.acceptance_criteria
+        if ($criteria.testable -and -not $criteria.present) { return $false }
+        if ($item.suitability -eq 'ready' -and -not $criteria.testable) { return $false }
+        if ($item.suitability -eq 'needs-info' -and @($item.questions).Count -eq 0) { return $false }
+        $pickup = Get-OptionalProperty $item 'pickup' $null
+        if ($null -ne $pickup -and $pickup.decision -eq 'start' -and ($Value.level -ne 3 -or $item.suitability -ne 'ready' -or $item.estimated_tier -ne 'routine')) { return $false }
+    }
     return $true
 }
 
@@ -156,6 +194,8 @@ function Test-ProcessContractSemantic {
 
 function Test-ProfileSemantic {
     param($Value)
+    $automation = Get-OptionalProperty $Value 'ticket_automation' $null
+    if ($null -ne $automation -and (($automation.level -eq 3) -ne [bool]$automation.pickup.enabled)) { return $false }
     $involvement = Get-OptionalProperty $Value 'human_involvement' $null
     if ($null -eq $involvement) { return $true }
     $timers = $involvement.timers
@@ -214,6 +254,7 @@ function Test-MigrationRecordSemantic {
         if ($applied -and $kind -eq 'CONFLICT') { return $false }
         if ($action.ownership -eq 'project-owned' -and $kind -notin @('KEEP', 'SKIP', 'SUGGEST', 'ADD', 'REMOVE')) { return $false }
         if ($kind -eq 'REMOVE' -and $Value.kind -ne 'rollback') { return $false }
+        if ($action.ownership -eq 'derived' -and $kind -notin @('ADD', 'REPLACE', 'RESTORE', 'REMOVE', 'SKIP')) { return $false }
         if ($kind -eq 'ADD' -and $null -ne $action.before_digest) { return $false }
         if ($applied -and $kind -in @('ADD', 'REPLACE', 'MERGE', 'RESTORE') -and $null -eq $action.after_digest) { return $false }
         if ($kind -in @('REPLACE', 'MERGE', 'RESTORE', 'REMOVE') -and $null -eq $action.before_digest) { return $false }
@@ -231,6 +272,12 @@ function Test-GateResultSemantic {
     if (@($Value.findings | Where-Object { $_.status -eq 'known' -and -not $_.ratchetable }).Count -gt 0) { return $false }
     if ($Value.status -eq 'report_only' -and $Value.mode -notin @('report', 'ratchet')) { return $false }
     return $true
+}
+
+function Test-TicketIntakeSemantic {
+    param($Value)
+    $linked = @($Value.linked | ForEach-Object { $_.id })
+    return (Test-UniqueOrdinal @($Value.comments | ForEach-Object { $_.id })) -and (Test-UniqueOrdinal $linked) -and ($linked -cnotcontains $Value.source.id)
 }
 
 function Test-GateBaselineSemantic {
@@ -257,6 +304,8 @@ $schemas = @{
     'migration-record' = Join-Path $schemaDir 'migration-record.schema.json'
     'gate-result' = Join-Path $schemaDir 'gate-result.schema.json'
     'gate-baseline' = Join-Path $schemaDir 'gate-baseline.schema.json'
+    'ticket-intake' = Join-Path $schemaDir 'ticket-intake.schema.json'
+    'triage-report' = Join-Path $schemaDir 'triage-report.schema.json'
 }
 
 foreach ($entry in $schemas.GetEnumerator()) {
@@ -347,7 +396,9 @@ $fixtureSets = @(
     @{ Name='migration-record'; Schema=$schemas['migration-record']; Semantic={ param($v) Test-MigrationRecordSemantic $v } },
     @{ Name='assurance-system-manifest'; Schema=$schemas.manifest; Semantic={ param($v) $true } },
     @{ Name='gate-result'; Schema=$schemas['gate-result']; Semantic={ param($v) Test-GateResultSemantic $v } },
-    @{ Name='gate-baseline'; Schema=$schemas['gate-baseline']; Semantic={ param($v) Test-GateBaselineSemantic $v } }
+    @{ Name='gate-baseline'; Schema=$schemas['gate-baseline']; Semantic={ param($v) Test-GateBaselineSemantic $v } },
+    @{ Name='ticket-intake'; Schema=$schemas['ticket-intake']; Semantic={ param($v) Test-TicketIntakeSemantic $v } },
+    @{ Name='triage-report'; Schema=$schemas['triage-report']; Semantic={ param($v) Test-TriageReportSemantic $v } }
 )
 $explicitlyChecked = @('assurance-system-manifest.valid.json', 'assurance-system-manifest.invalid.json')
 
@@ -497,6 +548,8 @@ $wrapperProblems = [System.Collections.Generic.List[string]]::new()
 $wrapperMarkers = [ordered]@{
     'adapters/github/assurance-gate.yml' = @('assurance_gate.py classify', 'assurance_gate.py "${args[@]}"', 'fetch-depth: 0')
     'adapters/gitlab/assurance-gate.gitlab-ci.yml' = @('assurance_gate.py classify', 'assurance_gate.py "$@"', 'GIT_DEPTH: "0"')
+    'adapters/github/assurance-deliver.yml' = @('github_forge.py can-act', 'async_deliver.py run', 'async_deliver.py resume', 'fetch-depth: 0')
+    'adapters/github/assurance-triage.yml' = @('github_forge.py open-issues', 'triage.py report', 'github_forge.py triage-apply', 'triage.py pickup', 'github_forge.py dispatch')
 }
 foreach ($entry in $wrapperMarkers.GetEnumerator()) {
     $path = Join-Path $rootPath $entry.Key
@@ -508,6 +561,43 @@ foreach ($entry in $wrapperMarkers.GetEnumerator()) {
     }
 }
 Add-Check 'ci-gate-wrappers' ($wrapperProblems.Count -eq 0) $(if ($wrapperProblems.Count -eq 0) { 'GitHub and GitLab wrappers call the forge-neutral gate with full history and pin every action to a commit SHA.' } else { $wrapperProblems -join '; ' })
+
+$claudeProblems = [System.Collections.Generic.List[string]]::new()
+$adapterDir = Join-Path $rootPath 'adapters/claude-code'
+try {
+    $claudeSettings = Read-JsonObject (Join-Path $adapterDir 'settings.json')
+    $events = @($claudeSettings.hooks.PSObject.Properties.Name | Sort-Object)
+    if (($events -join ',') -ne 'PostToolUse,PreToolUse,Stop') { $claudeProblems.Add('settings.json must configure PostToolUse, PreToolUse, and Stop hooks') }
+    foreach ($eventEntry in $claudeSettings.hooks.PSObject.Properties) {
+        foreach ($group in $eventEntry.Value) {
+            foreach ($handler in $group.hooks) {
+                if ($handler.type -ne 'command' -or -not ([string]$handler.command).Contains('${CLAUDE_PROJECT_DIR}/.claude/hooks/assurance-hook.sh')) { $claudeProblems.Add("hook does not call assurance-hook.sh: $($handler.command)") }
+            }
+        }
+    }
+} catch { $claudeProblems.Add("settings.json: $($_.Exception.Message)") }
+function Get-Frontmatter {
+    param([string]$Path)
+    if (-not (Test-Path -LiteralPath $Path)) { return '' }
+    $match = [regex]::Match((Get-Content -Raw -LiteralPath $Path), '(?s)^---\r?\n(.*?)\r?\n---\r?\n')
+    if ($match.Success) { return $match.Groups[1].Value } else { return '' }
+}
+$skillFront = Get-Frontmatter (Join-Path $adapterDir 'skills/deliver/SKILL.md')
+foreach ($marker in @('name: deliver', 'description:', 'disable-model-invocation: true')) { if (-not $skillFront.Contains($marker)) { $claudeProblems.Add("deliver skill frontmatter lacks $marker") } }
+foreach ($agentName in @('assurance-specifier', 'assurance-builder', 'assurance-reviewer')) {
+    $agentFront = Get-Frontmatter (Join-Path $adapterDir "agents/$agentName.md")
+    if (-not $agentFront.Contains("name: $agentName") -or -not $agentFront.Contains('description:')) { $claudeProblems.Add("agents/$agentName.md needs name: $agentName and a description") }
+}
+$reviewerFront = Get-Frontmatter (Join-Path $adapterDir 'agents/assurance-reviewer.md')
+$toolsLine = [regex]::Match($reviewerFront, '(?m)^tools:(.*)$')
+if (-not $toolsLine.Success -or $toolsLine.Groups[1].Value -match '\b(Edit|MultiEdit|NotebookEdit)\b' -or -not $reviewerFront.Contains('reviewer-write')) { $claudeProblems.Add('reviewer must list tools without Edit and scope its writes with the reviewer-write hook') }
+$claudeMdPath = Join-Path $adapterDir 'CLAUDE.md'
+$claudeMd = if (Test-Path -LiteralPath $claudeMdPath) { Get-Content -Raw -LiteralPath $claudeMdPath } else { '' }
+foreach ($marker in @('@AGENTS.md', '@.assurance/agent-pack.md')) { if (-not $claudeMd.Contains($marker)) { $claudeProblems.Add("CLAUDE.md lacks $marker") } }
+$packToolPath = Join-Path $rootPath 'tools/agent_pack.py'
+$packTool = if (Test-Path -LiteralPath $packToolPath) { Get-Content -Raw -LiteralPath $packToolPath } else { '' }
+if (-not $packTool.Contains('LIMIT = 6144')) { $claudeProblems.Add('agent_pack.py must enforce the 6 KiB pack limit') }
+Add-Check 'claude-code-adapter' ($claudeProblems.Count -eq 0) $(if ($claudeProblems.Count -eq 0) { 'Claude Code adapter: hooks call the entrypoint, the deliver skill is user-invoked, the reviewer cannot edit code, CLAUDE.md imports AGENTS.md and the pack, and the pack is size-limited.' } else { $claudeProblems -join '; ' })
 
 $versionPath = Join-Path $rootPath 'VERSION'
 $packageVersion = if (Test-Path -LiteralPath $versionPath) { (Get-Content -Raw -LiteralPath $versionPath).Trim() } else { '' }
@@ -538,7 +628,15 @@ $requiredFiles = @(
     'VERSION', 'schemas/verifier-config.schema.json', 'schemas/migration-record.schema.json', 'tools/run_verifier.py',
     'tools/verify-entrypoint.sh', 'tools/verify-entrypoint.ps1', 'tools/test_scaffold_project.py',
     'tools/assurance_gate.py', 'tools/test_assurance_gate.py', 'schemas/gate-result.schema.json', 'schemas/gate-baseline.schema.json',
-    'adapters/github/assurance-gate.yml', 'adapters/gitlab/assurance-gate.gitlab-ci.yml', 'adapters/gitlab/gitlab_mr.py'
+    'adapters/github/assurance-gate.yml', 'adapters/gitlab/assurance-gate.gitlab-ci.yml', 'adapters/gitlab/gitlab_mr.py',
+    'tools/delivery_run.py', 'tools/agent_pack.py', 'tools/test_claude_adapter.py',
+    'adapters/claude-code/CLAUDE.md', 'adapters/claude-code/settings.json', 'adapters/claude-code/hooks/assurance-hook.sh',
+    'adapters/claude-code/hooks/assurance_hooks.py', 'adapters/claude-code/skills/deliver/SKILL.md',
+    'adapters/claude-code/agents/assurance-specifier.md', 'adapters/claude-code/agents/assurance-builder.md', 'adapters/claude-code/agents/assurance-reviewer.md',
+    'tools/async_deliver.py', 'tools/run_metrics.py', 'tools/test_async_deliver.py', 'schemas/ticket-intake.schema.json',
+    'adapters/github/assurance-deliver.yml', 'adapters/github/ISSUE_TEMPLATE/specification.yml', 'adapters/github/github_forge.py',
+    'tools/triage.py', 'tools/found_bugs.py', 'tools/test_triage.py', 'schemas/triage-report.schema.json', 'adapters/github/assurance-triage.yml',
+    'tools/build_example.py', 'tools/test_build_example.py', 'tools/self_eval.py', 'tools/test_self_eval.py', 'evaluation/textkit-suite/suite.json'
 )
 $missingRequired = @($requiredFiles | Where-Object { -not (Test-Path -LiteralPath (Join-Path $rootPath $_)) })
 Add-Check 'required-artifacts-present' ($missingRequired.Count -eq 0) $(if ($missingRequired.Count -eq 0) { 'All required top-level artifacts are present.' } else { $missingRequired -join ', ' })

@@ -1,7 +1,7 @@
 # Verifier tier entrypoint. Installed as .assurance/tools/verify-fast.ps1, verify.ps1, and so on;
 # the tier is the file name. Local runs and CI call this same file.
 [CmdletBinding()]
-param()
+param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Rest)
 
 $ErrorActionPreference = 'Stop'
 $tier = [IO.Path]::GetFileNameWithoutExtension($PSCommandPath)
@@ -11,5 +11,5 @@ $python = if ($env:PYTHON) { $env:PYTHON } else {
     $candidate.Source
 }
 
-& $python (Join-Path $PSScriptRoot 'run_verifier.py') --tier $tier --root (Join-Path $PSScriptRoot '..\..')
+& $python (Join-Path $PSScriptRoot 'run_verifier.py') --tier $tier --root (Join-Path $PSScriptRoot '..\..') @Rest
 exit $LASTEXITCODE

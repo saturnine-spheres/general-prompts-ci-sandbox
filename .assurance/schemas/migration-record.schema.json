@@ -32,7 +32,7 @@
         "required": ["path", "ownership", "action", "before_digest", "after_digest", "upstream_digest"],
         "properties": {
           "path": {"type": "string", "pattern": "^(?![A-Za-z]:|/|.*(?:^|/)\\.\\.(?:/|$)).+$"},
-          "ownership": {"enum": ["upstream-managed", "merge-managed", "project-owned"]},
+          "ownership": {"enum": ["upstream-managed", "merge-managed", "project-owned", "derived"]},
           "action": {"enum": ["ADD", "REPLACE", "MERGE", "KEEP", "SKIP", "SUGGEST", "CONFLICT", "RESTORE", "REMOVE"]},
           "before_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},
           "after_digest": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"},

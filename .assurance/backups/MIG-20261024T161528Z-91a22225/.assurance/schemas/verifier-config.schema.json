@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.invalid/assurance/verifier-config.schema.json",
+  "title": "Verifier tier configuration",
+  "description": "Commands that the generic tier runner executes for each verifier tier. Commands are argument vectors run without a shell.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project", "stack", "generated_by", "tiers"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "project": {"type": "string", "minLength": 1},
+    "stack": {"enum": ["go", "node", "python", "custom"]},
+    "generated_by": {"type": "string", "minLength": 1},
+    "tiers": {
+      "type": "object", "additionalProperties": false,
+      "required": ["verify-fast", "verify"],
+      "properties": {
+        "verify-fast": {"$ref": "#/definitions/tier"},
+        "verify": {"$ref": "#/definitions/tier"},
+        "verify-live": {"$ref": "#/definitions/tier"},
+        "verify-release": {"$ref": "#/definitions/tier"}
+      }
+    }
+  },
+  "definitions": {
+    "argv": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "tier": {
+      "type": "object", "additionalProperties": false,
+      "required": ["output", "network", "container", "checks"],
+      "properties": {
+        "output": {"type": "string", "pattern": "^\\.assurance/(?!(?:.*/)?\\.\\.(?:/|$))[A-Za-z0-9._/-]+\\.json$"},
+        "network": {"enum": ["denied", "allowlisted"]},
+        "container": {
+          "type": ["object", "null"], "additionalProperties": false,
+          "required": ["image"],
+          "properties": {"image": {"type": "string", "minLength": 1}}
+        },
+        "checks": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "command", "version_command", "blocking", "fail_on_output", "control_ids", "timeout_seconds"],
+            "properties": {
+              "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+              "command": {"$ref": "#/definitions/argv"},
+              "version_command": {"$ref": "#/definitions/argv"},
+              "blocking": {"type": "boolean"},
+              "fail_on_output": {"type": "boolean"},
+              "control_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^[A-Z]{3}-[0-9]{3}$"}},
+              "timeout_seconds": {"type": "integer", "minimum": 1}
+            }
+          }
+        }
+      }
+    }
+  }
+}
