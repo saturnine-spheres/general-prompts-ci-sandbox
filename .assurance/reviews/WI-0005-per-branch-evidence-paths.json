@@ -1,0 +1,94 @@
+{
+  "schema_version": "1.1.0",
+  "record_id": "REV-WI0005-7F9E06BF0B7C",
+  "work_item": "docs/work-items/WI-0005-per-branch-evidence-paths.md",
+  "revision": "sha256:5096588e936116d27f7d1823b8ea4aea72c6267dcf1162b99e29dbb086527c21",
+  "implementer": {
+    "identity": "agent:claude-code-terminal-session",
+    "kind": "agent",
+    "context_id": "praxis-ledger-session-2026-10-24"
+  },
+  "reviewer": {
+    "identity": "agent:claude-code-terminal-session",
+    "kind": "agent",
+    "context_id": "praxis-ledger-session-2026-10-24",
+    "authorized_role": "implementing agent self-check",
+    "independent": false,
+    "independence_basis": "Same agent and same context as the implementer; not independent. The owner's GitHub review is the independent review."
+  },
+  "scope": [
+    ".assurance/project-assurance-profile.json",
+    ".assurance/assurance-system-manifest.json",
+    "docs/work-items/WI-0005-per-branch-evidence-paths.md"
+  ],
+  "evidence": [
+    {
+      "type": "work_item",
+      "uri": "docs/work-items/WI-0005-per-branch-evidence-paths.md",
+      "digest": "sha256:8c597fbbe8061ddd7d12b9934c4e26c1fd9a9d75c7d8559d4989c4fae53f19b7"
+    },
+    {
+      "type": "verification_result",
+      "uri": ".assurance/evidence/profile-per-branch-evidence-paths/verify-fast.json",
+      "digest": "sha256:4cd0757b2d4022c721f57f834b8f7c886c1c30cf021ab7ceaf8636adffe18ee2"
+    },
+    {
+      "type": "verification_result",
+      "uri": ".assurance/evidence/profile-per-branch-evidence-paths/verify.json",
+      "digest": "sha256:564f87ca02cc3d76d8dc35ef4da8ecf4e8a1f373744455c3fe4b0bbce894e560"
+    }
+  ],
+  "findings": [],
+  "acceptance_criteria": [
+    {
+      "id": "AC-1",
+      "verdict": "met",
+      "rationale": "Both evidence_path values are the per-branch paths verifiers.json writes; the diff changes only those two values.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": ".assurance/project-assurance-profile.json",
+          "digest": "sha256:f1234808c0320f04e1503683510086cef99f8bc1413434e2c34c432e86acd80d"
+        }
+      ]
+    },
+    {
+      "id": "AC-2",
+      "verdict": "met",
+      "rationale": "Both tiers passed on the branch commit in the Praxis verification image and wrote their records under this branch's folder, where the profile path resolves.",
+      "evidence": [
+        {
+          "type": "verification_result",
+          "uri": ".assurance/evidence/profile-per-branch-evidence-paths/verify-fast.json",
+          "digest": "sha256:4cd0757b2d4022c721f57f834b8f7c886c1c30cf021ab7ceaf8636adffe18ee2"
+        },
+        {
+          "type": "verification_result",
+          "uri": ".assurance/evidence/profile-per-branch-evidence-paths/verify.json",
+          "digest": "sha256:564f87ca02cc3d76d8dc35ef4da8ecf4e8a1f373744455c3fe4b0bbce894e560"
+        }
+      ]
+    },
+    {
+      "id": "AC-3",
+      "verdict": "met",
+      "rationale": "The manifest's installed_digest is the profile's normalized digest; validate_installed_assurance reports only the placeholder finding also present on main.",
+      "evidence": [
+        {
+          "type": "file",
+          "uri": ".assurance/assurance-system-manifest.json",
+          "digest": "sha256:0652164e17b2f1d7fc336fa0edcb1a1557c9c5b79612494040a2d510bcfd01f1"
+        }
+      ]
+    }
+  ],
+  "decision": "approve",
+  "started_at": "2026-10-24T17:52:01Z",
+  "completed_at": "2026-10-24T17:52:01Z",
+  "signature": {
+    "state": "unverified",
+    "format": "none",
+    "signer": "agent:claude-code-terminal-session",
+    "value_reference": "unsigned; committed in a signed commit on profile/per-branch-evidence-paths"
+  }
+}
