@@ -25,6 +25,8 @@ sys.dont_write_bytecode = True  # keep installed .assurance/tools free of __pyca
 from validate_artifacts import content_sha256, read_json, schema_accepts, verification_semantic
 
 TIERS = ("verify-fast", "verify", "verify-live", "verify-release")
+# Evidence written by one tier must not make the next tier's revision "dirty"; the gate ignores these paths too.
+EVIDENCE_PREFIXES = (".assurance/evidence/", ".assurance/runs/", ".assurance/reviews/", ".assurance/waivers/", ".assurance/baseline/", ".assurance/approvals/")
 
 
 def utc_now() -> str:
@@ -42,7 +44,7 @@ def git(root: pathlib.Path, *arguments: str) -> str | None:
 def revision_identity(root: pathlib.Path) -> tuple[str, bool, list[str]]:
     """Return a sha256 revision identity, the dirty flag, and limitations."""
     commit = (git(root, "rev-parse", "HEAD") or "").strip()
-    status = git(root, "status", "--porcelain")
+    status = git(root, "status", "--porcelain", "--", ".", *(f":(exclude){prefix}" for prefix in EVIDENCE_PREFIXES))
     if not commit or status is None:
         return "sha256:" + hashlib.sha256(b"unversioned:" + str(root).encode("utf-8")).hexdigest(), True, [
             "No Git revision was available; the revision digest identifies the working directory path only."
@@ -50,7 +52,7 @@ def revision_identity(root: pathlib.Path) -> tuple[str, bool, list[str]]:
     dirty = bool(status.strip())
     material = f"git-commit:{commit}"
     if dirty:
-        material += "\n" + (git(root, "diff", "HEAD") or "") + status
+        material += "\n" + (git(root, "diff", "HEAD", "--", ".", *(f":(exclude){prefix}" for prefix in EVIDENCE_PREFIXES)) or "") + status
     limitation = f"Revision digest is sha256 over Git commit {commit}" + (" plus the uncommitted diff." if dirty else ".")
     return "sha256:" + hashlib.sha256(material.encode("utf-8")).hexdigest(), dirty, [limitation]
 

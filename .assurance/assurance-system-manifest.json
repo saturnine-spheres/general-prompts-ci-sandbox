@@ -5,7 +5,7 @@
     "version": "1.5.0",
     "source": "C:\\Users\\ville\\saturnine-spheres\\general-prompts",
     "source_revision": "unknown:local-distribution-no-immutable-revision",
-    "distribution_digest": "sha256:42e44746713b6bccbcc46fd91439a2da8bb736b9e1c6c828d45f1577d3aa754a"
+    "distribution_digest": "sha256:d629aaecc0c287bf27d993f79b2c181809f4c85720595a767c40a0756d7e3dbe"
   },
   "installation": {
     "mode": "existing",
@@ -42,9 +42,9 @@
       "path": ".assurance/project-assurance-profile.json",
       "upstream_path": "project-assurance-profile.template.json",
       "upstream_digest": "sha256:fdb65fd99d90923306dca426db78daefe10d7224bbf47b45b6eb5cd553e4aeb8",
-      "installed_digest": "sha256:fdb65fd99d90923306dca426db78daefe10d7224bbf47b45b6eb5cd553e4aeb8",
+      "installed_digest": "sha256:30e210ebd8b0c402c3d0b6353a7d4f910a89e3a1ccb2860965fb423d73d354b3",
       "ownership": "project-owned",
-      "local_changes": false
+      "local_changes": true
     },
     {
       "path": ".assurance/process.json",
@@ -249,8 +249,8 @@
     {
       "path": ".assurance/tools/run_verifier.py",
       "upstream_path": "tools/run_verifier.py",
-      "upstream_digest": "sha256:db0683cc22cf4db81a051873e8e6367c8b12262c44f04478a097f03363c5f50b",
-      "installed_digest": "sha256:db0683cc22cf4db81a051873e8e6367c8b12262c44f04478a097f03363c5f50b",
+      "upstream_digest": "sha256:07a995cbd26b22d8c6bac0ad30c49c704ecf71afb4809174bcc03f94471773b9",
+      "installed_digest": "sha256:07a995cbd26b22d8c6bac0ad30c49c704ecf71afb4809174bcc03f94471773b9",
       "ownership": "upstream-managed",
       "local_changes": false
     },
@@ -347,5 +347,15 @@
       "Existing-repository adoption: existing files were kept; merge-managed upstream text marked SUGGEST is merged by review."
     ]
   },
-  "migration_history": []
+  "migration_history": [
+    {
+      "from_version": "1.5.0",
+      "to_version": "1.5.0",
+      "changed_at": "2026-10-24T09:56:38.123482Z",
+      "owner": "saturnine-spheres",
+      "record": ".assurance/migrations/MIG-20261024T095638Z-f6feb653.json",
+      "result": "applied",
+      "migration_id": "MIG-20261024T095638Z-f6feb653"
+    }
+  ]
 }
