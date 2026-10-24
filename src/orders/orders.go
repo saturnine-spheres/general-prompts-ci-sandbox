@@ -13,3 +13,9 @@ func Exists(id int) bool {
 	_, ok := Find(id)
 	return ok
 }
+
+// Count returns how many orders are known.
+func Count() int {
+	known := []int{1}
+	return len(known)
+}

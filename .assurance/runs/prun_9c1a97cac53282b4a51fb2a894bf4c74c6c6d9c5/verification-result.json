@@ -1,0 +1,40 @@
+{
+  "result": "passed",
+  "image": "127.0.0.1:5000/praxis-v0-verify-go@sha256:7a3dae29cac5239fbad564a8cbceb9d55c4faa3c8631f1fe63a2415dad872245",
+  "source": "repository",
+  "declared_network": {
+    "verify": "allowlisted",
+    "verify-fast": "denied"
+  },
+  "commit": "f43677687e99f28cac52a7fa452225abec944990",
+  "commands": [
+    {
+      "name": "verify-fast",
+      "argv": [
+        "sh",
+        "-c",
+        "bash .assurance/tools/verify-fast.sh"
+      ],
+      "exit_code": 0,
+      "output_digest": "sha256:d93b9609d36ea14a714b487eda630e45320b9dcf0f3639b9e11d77392c232431",
+      "output_ref": "v0-log:pnr_45a32639e60c4d1ac64bf2d405295aedaf1afbf4/verify-fast",
+      "duration_milliseconds": 11401,
+      "record": ".assurance/evidence/praxis-run-prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verify-fast.json",
+      "record_digest": "sha256:f596b0d2baaa50c6dc3ccdd2b5f77fe9e16e3ab37ae95c6c909ab8042beb8775"
+    },
+    {
+      "name": "verify",
+      "argv": [
+        "sh",
+        "-c",
+        "bash .assurance/tools/verify.sh"
+      ],
+      "exit_code": 0,
+      "output_digest": "sha256:98c41008db09b79d5140094b0abd1f3e9cc0b54d73c606f343e02d38a6cd68fa",
+      "output_ref": "v0-log:pnr_45a32639e60c4d1ac64bf2d405295aedaf1afbf4/verify",
+      "duration_milliseconds": 9622,
+      "record": ".assurance/evidence/praxis-run-prun_9c1a97cac53282b4a51fb2a894bf4c74c6c6d9c5/verify.json",
+      "record_digest": "sha256:89aa257452e54875827372446931a41e4377831186d65cc0fc7238c85dd880f7"
+    }
+  ]
+}

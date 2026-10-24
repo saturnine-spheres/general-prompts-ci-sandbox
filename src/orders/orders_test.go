@@ -16,3 +16,18 @@ func TestExists(t *testing.T) {
 		t.Fatal("Exists must be true for 1 and false for 2")
 	}
 }
+
+func TestCount(t *testing.T) {
+	if got := Count(); got != 1 {
+		t.Fatalf("Count() = %d, want 1", got)
+	}
+	known := 0
+	for id := -5; id <= 100; id++ {
+		if Exists(id) {
+			known++
+		}
+	}
+	if got := Count(); got != known {
+		t.Fatalf("Count() = %d, but Find recognises %d IDs", got, known)
+	}
+}
