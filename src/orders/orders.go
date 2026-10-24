@@ -7,3 +7,9 @@ func Find(id int) (string, bool) {
 	name, ok := orders[id]
 	return name, ok
 }
+
+// Exists reports whether an order ID is known.
+func Exists(id int) bool {
+	_, ok := Find(id)
+	return ok
+}

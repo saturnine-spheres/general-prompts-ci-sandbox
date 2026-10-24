@@ -10,3 +10,9 @@ func TestFind(t *testing.T) {
 		t.Fatal("Find(2) should be unknown")
 	}
 }
+
+func TestExists(t *testing.T) {
+	if !Exists(1) || Exists(2) {
+		t.Fatal("Exists must be true for 1 and false for 2")
+	}
+}
