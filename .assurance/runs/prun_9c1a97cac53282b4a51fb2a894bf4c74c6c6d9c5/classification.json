@@ -1,0 +1,23 @@
+{
+  "stage": "classify",
+  "change_classes": [
+    "domain_code"
+  ],
+  "proposed_tier": "routine",
+  "result": {
+    "tier": "routine",
+    "reasons": [
+      {
+        "code": "proposed_tier",
+        "tier": "routine"
+      }
+    ],
+    "rules_digest": "sha256:b37013c03a9edf03ec0d3bbaf7884bb12d2ccf0ddbb7ac5629f686e9b74ed395"
+  },
+  "rules": {
+    "source": "repository",
+    "block_digest": "sha256:046916b12b6402f4c70e0e1c5d86852be45aab05228357b41ccd47adf9b81c4f",
+    "budget_cents": 500,
+    "matrix_digest": "sha256:aeb0773a9f4fb943259b0b6ea3b85205c9cfbb049ea66af5ef0f85e5aa18c261"
+  }
+}
