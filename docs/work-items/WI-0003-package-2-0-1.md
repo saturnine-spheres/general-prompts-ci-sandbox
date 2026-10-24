@@ -18,7 +18,7 @@ Merging one pull request no longer forces every other open pull request to resol
 
 ## Change declaration
 
-- Change classes: `ci_enforcement`
+- Change classes: `dependencies_tooling`, `infrastructure`
 - Risk class: `moderate`
 - Escalation triggers present: governance files under `.assurance/` change, so the change is significant and needs a stakeholder approval.
 
